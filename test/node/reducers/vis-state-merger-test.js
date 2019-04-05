@@ -119,6 +119,7 @@ test('VisStateMerger.v1 -> mergeFilters -> toEmptyState', t => {
   const savedConfig = cloneDeep(savedStateV1);
   const oldState = cloneDeep(InitialState);
   const oldVisState = oldState.visState;
+  const expectedMergedFilterV1 = mergedFiltersV1;
 
   const parsedConfig = SchemaManager.parseSavedConfig(
     savedConfig.config,
@@ -127,7 +128,6 @@ test('VisStateMerger.v1 -> mergeFilters -> toEmptyState', t => {
   const parsedFilters = parsedConfig.visState.filters;
 
   const mergedState = mergeFilters(oldState.visState, parsedFilters);
-
   Object.keys(oldVisState).forEach(key => {
     if (key === 'filterToBeMerged') {
       t.deepEqual(
@@ -150,7 +150,7 @@ test('VisStateMerger.v1 -> mergeFilters -> toEmptyState', t => {
   const stateWData = visStateReducer(mergedState, updateVisData(parsedData));
 
   // test parsed filters
-  cmpFilters(t, mergedFiltersV1, stateWData.filters);
+  cmpFilters(t, expectedMergedFilterV1, stateWData.filters);
   t.end();
 });
 
