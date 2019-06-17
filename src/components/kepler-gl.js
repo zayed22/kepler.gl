@@ -212,7 +212,8 @@ function KeplerGlFactory(
         layerData,
         hoverInfo,
         clicked,
-        mousePos
+        mousePos,
+        joinData
       } = visState;
 
       const notificationPanelFields = {
@@ -228,6 +229,7 @@ function KeplerGlFactory(
         layers,
         layerOrder,
         layerClasses,
+        joinData,
         interactionConfig,
         mapStyle,
         layerBlending,
