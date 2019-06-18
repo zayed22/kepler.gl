@@ -51,6 +51,7 @@ import {
   getOrdinalDomain,
   getLinearDomain
 } from 'utils/data-scale-utils';
+import { getFieldDomain } from 'utils/filter-utils';
 
 /**
  * Approx. number of points to sample in a large data set
@@ -76,6 +77,7 @@ function* generateColor() {
 
 export const colorMaker = generateColor();
 const defaultGetFieldValue = (field, d) => d[field.tableFieldIndex - 1];
+const defaultDomain = [0, 1];
 
 export default class Layer {
   constructor(props = {}) {
@@ -290,11 +292,11 @@ export default class Layer {
       // TODO: refactor this into separate visual Channel config
       // color by field, domain is set by filters, field, scale type
       colorField: null,
-      colorDomain: [0, 1],
+      colorDomain: defaultDomain,
       colorScale: 'quantile',
 
       // color by size, domain is set by filters, field, scale type
-      sizeDomain: [0, 1],
+      sizeDomain: defaultDomain,
       sizeScale: 'linear',
       sizeField: null,
 
@@ -607,6 +609,64 @@ export default class Layer {
       : DEFAULT_LIGHT_SETTINGS;
   }
 
+  accessVSFieldValue(datasets, field, indexKey = 1481826206000) {
+    // indexMap: indexBy? [sourceIdx -> ts -> targetIdx] : [sourceIdx -> targetIdx]
+
+    const getDataRow = ({data, index}) => {
+      if (field.joinedFrom) {
+        const targetData = datasets[field.joinedFrom.id];
+        const sourceData = datasets[this.config.dataId];
+        const targetRowIdx =  field.indexBy ?
+          sourceData.joinData.indexMap[index] ?
+          sourceData.joinData.indexMap[index][indexKey] : -1
+          : sourceData.indexMap[index];
+        const targetRow = targetRowIdx > -1 ? targetData.allData[targetRowIdx] : null;
+
+        return targetRow;
+      }
+      return data
+    }
+
+    return d => {
+      const dataRow = getDataRow(d);
+      return dataRow ? field.valueAccessor(dataRow) : null;
+    }
+      // const {data, index} = d;
+      // return field.valueAccessor(getDataRow(d));
+      // if (field.joinedFrom) {
+
+      //   const targetRowIdx =  field.indexBy ?
+      //     sourceData.indexMap[index][indexKey] : sourceData.indexMap[index];
+      //   const targetRow = targetData[targetRowIdx];
+
+      //   return field.valueAccessor(targetRow);
+      // }
+
+      // return field.valueAccessor(data);
+    // }
+  }
+
+  encodeChannelValue(
+    scale,
+    fieldValueAccessor,
+    identity = d => d,
+    defaultValue = NO_VALUE_COLOR,
+  ) {
+    return d => {
+      const data = identity(d);
+      const value = fieldValueAccessor(data);
+      // console.log(value);
+      if (notNullorUndefined(value)) {
+        return scale(value);
+      }
+      // console.log(defaultValue)
+
+      return defaultValue;
+      // const attributeValue = scale(value);
+      // return notNullorUndefined(attributeValue) ?  attributeValue : defaultValue;
+    };
+  }
+
   getEncodedChannelValue(
     scale,
     data,
@@ -614,27 +674,23 @@ export default class Layer {
     nullValue = NO_VALUE_COLOR,
     getValue = defaultGetFieldValue
   ) {
-    const {type} = field;
-    const value = getValue(field, data);
-
+    // sourceData.indexMap[index][ts]
+    // const {valueAccessor} = field;
+    const value = field.valueAccessor(data);
     if (!notNullorUndefined(value)) {
       return nullValue;
     }
+    const attributeValue = scale(value);
+    // // attributeValue
+    // if (type === ALL_FIELD_TYPES.timestamp) {
+    //   // shouldn't need to convert here
+    //   // scale Function should take care of it
+    //   attributeValue = scale(new Date(value));
+    // } else {
+    //   attributeValue = scale(value);
+    // }
 
-    let attributeValue;
-    if (type === ALL_FIELD_TYPES.timestamp) {
-      // shouldn't need to convert here
-      // scale Function should take care of it
-      attributeValue = scale(new Date(value));
-    } else {
-      attributeValue = scale(value);
-    }
-
-    if (!notNullorUndefined(attributeValue)) {
-      attributeValue = nullValue;
-    }
-
-    return attributeValue;
+    return notNullorUndefined(attributeValue) ?  attributeValue : nullValue;
   }
 
   updateMeta(meta) {
@@ -726,27 +782,44 @@ export default class Layer {
       [this.getDefaultLayerConfig()[scale]];
   }
 
-  updateLayerVisualChannel(dataset, channel) {
+  updateLayerVisualChannel(datasets, channel, newConfig) {
     const visualChannel = this.visualChannels[channel];
 
     this.validateVisualChannel(channel);
       // calculate layer channel domain
-    const updatedDomain = this.calculateLayerDomain(dataset, visualChannel);
+    const updatedDomain = this.calculateLayerDomain(datasets, visualChannel);
+    // create animation if field is indexby time
+    const field = this.config[this.visualChannels[channel].field];
+    if (field && field.indexBy && field.indexBy.type === ALL_FIELD_TYPES.timestamp) {
+      const datasetId = field.joinedFrom ? field.joinedFrom.id : this.config.dataId;
 
+      const timeDomain = getFieldDomain(
+        datasets[datasetId].allData, field.indexBy
+      )
+      console.log(timeDomain)
+      this.updateLayerConfig({
+        animation: {
+          domain: timeDomain,
+          currentTime: timeDomain[0]
+        }
+      });
+
+      console.log('find indexby field')
+    }
     this.updateLayerConfig({[visualChannel.domain]: updatedDomain});
   }
 
-  calculateLayerDomain(dataset, visualChannel) {
-    const {allData, filteredIndexForDomain} = dataset;
-    const defaultDomain = [0, 1];
-    const {scale} = visualChannel;
-    const scaleType = this.config[scale];
-
+  calculateLayerDomain(datasets, visualChannel) {
     const field = this.config[visualChannel.field];
     if (!field) {
       // if colorField or sizeField were set back to null
       return defaultDomain;
     }
+    const datasetId = field.joinedFrom ? field.joinedFrom.id : this.config.dataId;
+    // const dataset = datasets[datasetId];
+    const {allData, filteredIndexForDomain} = datasets[datasetId];
+    const {scale} = visualChannel;
+    const scaleType = this.config[scale];
 
     if (!SCALE_TYPES[scaleType]) {
       Console.error(`scale type ${scaleType} not supported`);
@@ -754,14 +827,15 @@ export default class Layer {
     }
 
     // TODO: refactor to add valueAccessor to field
-    const fieldIdx = field.tableFieldIndex - 1;
-    const isTime = field.type === ALL_FIELD_TYPES.timestamp;
-    const valueAccessor = maybeToDate.bind(
-      null,
-      isTime,
-      fieldIdx,
-      field.format
-    );
+    const {valueAccessor} = field;
+    // const fieldIdx = field.tableFieldIndex - 1;
+    // const isTime = field.type === ALL_FIELD_TYPES.timestamp;
+    // const valueAccessor = maybeToDate.bind(
+    //   null,
+    //   isTime,
+    //   fieldIdx,
+    //   field.format
+    // );
     const indexValueAccessor = i => valueAccessor(allData[i]);
 
     const sortFunction = getSortingFunction(field.type);

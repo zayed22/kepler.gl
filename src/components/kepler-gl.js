@@ -322,6 +322,7 @@ function KeplerGlFactory(
             }
             <BottomWidget
               filters={filters}
+              layers={layers}
               datasets={datasets}
               uiState={uiState}
               visStateActions={visStateActions}
