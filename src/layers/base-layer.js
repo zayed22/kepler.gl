@@ -785,7 +785,7 @@ export default class Layer {
         animation: {
           domain: timeDomain,
           // duration: timeDomain.duration,
-          duration: 1000,
+          duration: 250,
           // speed: 1000,
           currentTime: timeDomain.domain[0]
         }
