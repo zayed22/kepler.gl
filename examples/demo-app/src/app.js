@@ -124,6 +124,7 @@ class App extends Component {
     // }
     // load sample data
     // this._loadSampleData();
+
     // Notifications
     // this._loadMockNotifications();
   }
