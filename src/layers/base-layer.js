@@ -616,10 +616,13 @@ export default class Layer {
       if (field.joinedFrom) {
         const targetData = datasets[field.joinedFrom.id];
         const sourceData = datasets[this.config.dataId];
+        const {indexMap} = sourceData.joinData;
+
         const targetRowIdx =  field.indexBy ?
-          sourceData.joinData.indexMap[index] ?
-          sourceData.joinData.indexMap[index][indexKey] : -1
-          : sourceData.indexMap[index];
+          indexMap[index] ?
+          indexMap[index][indexKey] : -1
+          : indexMap[index];
+        // const targetRowIdx =  indexMap[index] > -1 ? field.indexBy ? indexMap[index][indexKey] :  indexMap[index] : -1;
         const targetRow = targetRowIdx > -1 ? targetData.allData[targetRowIdx] : null;
 
         return targetRow;
@@ -790,8 +793,6 @@ export default class Layer {
           currentTime: timeDomain.domain[0]
         }
       });
-
-      console.log('find indexby field')
     }
     this.updateLayerConfig({[visualChannel.domain]: updatedDomain});
   }

@@ -53,8 +53,8 @@ import sampleIconCsv, {config as savedMapConfig} from './data/sample-icon-csv';
 import {addDataToMap, addNotification} from 'kepler.gl/actions';
 import {processCsvData, processGeojson} from 'kepler.gl/processors';
 
-// import timeTable from './data/pool_time_table';
-// import roadJson from './data/sf_road_segments';
+import timeTable from './data/pool_time_table';
+import roadJson from './data/sf_road_segments';
 // console.log(timeTable)
 // console.log(roadJson)
 /* eslint-enable no-unused-vars */
@@ -169,7 +169,7 @@ class App extends Component {
     // this._loadGeojsonData();
     // this._loadIconData();
     // this._loadH3HexagonData();
-    // this._loadTimeTable();
+    this._loadTimeTable();
   }
 
   _loadTimeTable() {

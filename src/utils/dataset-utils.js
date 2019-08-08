@@ -255,7 +255,7 @@ export const joinTable = (state, joinData) => {
   }
 
   const targetFieldsToAppend = targetData.fields
-    .filter(f => f.name !== target.field.name && f.name !== target.indexBy.name)
+    .filter(f => f.name !== target.field.name && (f.name !== (target.indexBy || {}).name))
     .map(f => ({
       ...f,
       joinedFrom: pick(targetData, ['id', 'label', 'color']),
