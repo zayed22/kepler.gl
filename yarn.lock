@@ -881,15 +881,15 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@deck.gl/aggregation-layers@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/aggregation-layers/-/aggregation-layers-7.1.4.tgz#229f956d5c20e8f1a403b6a020e1b116ce550c6d"
+"@deck.gl/aggregation-layers@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/aggregation-layers/-/aggregation-layers-7.1.11.tgz#6b66f81a9ff0b120f5b8997c1eee38bf40e106ba"
   dependencies:
     d3-hexbin "^0.2.1"
 
-"@deck.gl/core@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/core/-/core-7.1.4.tgz#d4d110ffb6cc413a2b46ac9a647a530c4049c6e2"
+"@deck.gl/core@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/core/-/core-7.1.11.tgz#b5da356053b28767b95d16c29afc1010e21f4e89"
   dependencies:
     "@luma.gl/core" "^7.1.0"
     gl-matrix "^3.0.0"
@@ -899,52 +899,53 @@
     seer "^0.2.4"
     viewport-mercator-project "^6.1.0"
 
-"@deck.gl/geo-layers@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/geo-layers/-/geo-layers-7.1.4.tgz#bd8b1d41de3e9dd4f47ab5b01111277ff3b4ad9b"
+"@deck.gl/geo-layers@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/geo-layers/-/geo-layers-7.1.11.tgz#d574a607af10d793194f6a9ee3ce440488da422a"
   dependencies:
     h3-js "^3.4.3"
+    long "^3.2.0"
     s2-geometry "^1.2.10"
 
-"@deck.gl/google-maps@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/google-maps/-/google-maps-7.1.4.tgz#d5a51ae55ec2b4f2fac963e646b0672391ae9d78"
+"@deck.gl/google-maps@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/google-maps/-/google-maps-7.1.11.tgz#d85cf3a81ee2a5123e46b4c85d0c8ef7034c4476"
 
-"@deck.gl/json@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/json/-/json-7.1.4.tgz#5e71f2e53286048c7540e3e1dd85b91348e2599f"
+"@deck.gl/json@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/json/-/json-7.1.11.tgz#8342322e3cfca8a0e14a970766a793b4e7cb4e06"
   dependencies:
     d3-dsv "^1.0.8"
 
-"@deck.gl/layers@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/layers/-/layers-7.1.4.tgz#dd66df5d2c62b41b8ac22e4800327c61973fa77c"
+"@deck.gl/layers@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/layers/-/layers-7.1.11.tgz#d53175a9adfb03869084acc33145c846458d40c8"
   dependencies:
     "@loaders.gl/core" "^1.0.3"
     "@loaders.gl/images" "^1.0.3"
     "@mapbox/tiny-sdf" "^1.1.0"
     earcut "^2.0.6"
 
-"@deck.gl/mapbox@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/mapbox/-/mapbox-7.1.4.tgz#c61c0da16da93e57ba6e072784e5a5266be70fe8"
+"@deck.gl/mapbox@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/mapbox/-/mapbox-7.1.11.tgz#87d2e9306f0ce7679ddc95b11e33b7c2d1ee9d9d"
 
-"@deck.gl/mesh-layers@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/mesh-layers/-/mesh-layers-7.1.4.tgz#3fcf3afc795255dec2a52a83a16e0cc42efa35f6"
+"@deck.gl/mesh-layers@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/mesh-layers/-/mesh-layers-7.1.11.tgz#f2eef1962e1f868957b88113f6f57dc94636ba64"
   dependencies:
     "@loaders.gl/core" "^1.0.3"
     "@loaders.gl/images" "^1.0.3"
 
-"@deck.gl/react@7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/react/-/react-7.1.4.tgz#4a2c7939738f41697ae75cf51ddfeaf66ea808fe"
+"@deck.gl/react@7.1.11":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/react/-/react-7.1.11.tgz#dbd84a2bec4551841e4592da58a064e0d0d80693"
   dependencies:
     prop-types "^15.6.0"
 
-"@deck.gl/test-utils@^7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@deck.gl/test-utils/-/test-utils-7.1.4.tgz#c62ebe35bf78fb2b00b7874657da63747d937685"
+"@deck.gl/test-utils@^7.1.5":
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/@deck.gl/test-utils/-/test-utils-7.1.11.tgz#ba1bffb21e12eb761e14301b906106db52967cdf"
 
 "@emotion/is-prop-valid@^0.7.3":
   version "0.7.3"
@@ -2932,19 +2933,19 @@ decamelize@^1.1.1, decamelize@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
 
-deck.gl@^7.1.4:
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/deck.gl/-/deck.gl-7.1.4.tgz#0ec4f37ac392c82456e73dacfb5c0a4f82b8c476"
+deck.gl@^7.1.5:
+  version "7.1.11"
+  resolved "https://registry.yarnpkg.com/deck.gl/-/deck.gl-7.1.11.tgz#bed2b80b87670a9efa239ac95a9edb50ac46e9e8"
   dependencies:
-    "@deck.gl/aggregation-layers" "7.1.4"
-    "@deck.gl/core" "7.1.4"
-    "@deck.gl/geo-layers" "7.1.4"
-    "@deck.gl/google-maps" "7.1.4"
-    "@deck.gl/json" "7.1.4"
-    "@deck.gl/layers" "7.1.4"
-    "@deck.gl/mapbox" "7.1.4"
-    "@deck.gl/mesh-layers" "7.1.4"
-    "@deck.gl/react" "7.1.4"
+    "@deck.gl/aggregation-layers" "7.1.11"
+    "@deck.gl/core" "7.1.11"
+    "@deck.gl/geo-layers" "7.1.11"
+    "@deck.gl/google-maps" "7.1.11"
+    "@deck.gl/json" "7.1.11"
+    "@deck.gl/layers" "7.1.11"
+    "@deck.gl/mapbox" "7.1.11"
+    "@deck.gl/mesh-layers" "7.1.11"
+    "@deck.gl/react" "7.1.11"
 
 decode-uri-component@^0.2.0:
   version "0.2.0"
@@ -3623,9 +3624,9 @@ eslint@^5.16.0:
     table "^5.2.3"
     text-table "^0.2.0"
 
-esm@^3.0.84:
-  version "3.2.22"
-  resolved "https://registry.yarnpkg.com/esm/-/esm-3.2.22.tgz#5062c2e22fee3ccfee4e8f20da768330da90d6e3"
+esm@~3.0.84:
+  version "3.0.84"
+  resolved "https://registry.yarnpkg.com/esm/-/esm-3.0.84.tgz#bb108989f4673b32d4f62406869c28eed3815a63"
 
 espree@^5.0.1:
   version "5.0.1"
@@ -5408,10 +5409,6 @@ just-curry-it@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/just-curry-it/-/just-curry-it-3.1.0.tgz#ab59daed308a58b847ada166edd0a2d40766fbc5"
 
-kdbush@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/kdbush/-/kdbush-1.0.1.tgz#3cbd03e9dead9c0f6f66ccdb96450e5cecc640e0"
-
 kdbush@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/kdbush/-/kdbush-3.0.0.tgz#f8484794d47004cc2d85ed3a79353dbe0abc2bf0"
@@ -5584,7 +5581,7 @@ lodash.isplainobject@^4.0.6:
 
 lodash.keyby@^4.6.0:
   version "4.6.0"
-  resolved "https://unpm.uberinternal.com/lodash.keyby/-/lodash.keyby-4.6.0.tgz#7f6a1abda93fd24e22728a4d361ed8bcba5a4354"
+  resolved "https://registry.yarnpkg.com/lodash.keyby/-/lodash.keyby-4.6.0.tgz#7f6a1abda93fd24e22728a4d361ed8bcba5a4354"
 
 lodash.memoize@^4.1.2:
   version "4.1.2"
@@ -5692,9 +5689,9 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-mapbox-gl@~0.53.0:
-  version "0.53.1"
-  resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-0.53.1.tgz#08a956d8da54b04bc7f29ab1319bddb9c97ddedf"
+mapbox-gl@^1.0.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-1.2.0.tgz#2bb281dfe20cf8fcf66486d46fb6a8607355633a"
   dependencies:
     "@mapbox/geojson-rewind" "^0.4.0"
     "@mapbox/geojson-types" "^1.0.2"
@@ -5707,7 +5704,7 @@ mapbox-gl@~0.53.0:
     "@mapbox/whoots-js" "^3.1.0"
     csscolorparser "~1.0.2"
     earcut "^2.1.5"
-    esm "^3.0.84"
+    esm "~3.0.84"
     geojson-vt "^3.2.1"
     gl-matrix "^3.0.0"
     grid-index "^1.1.0"
@@ -6010,16 +6007,16 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
-mjolnir.js@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/mjolnir.js/-/mjolnir.js-2.1.0.tgz#e8a4727e86d8f9352d6b6fe9cdc6faab0dcff15e"
+mjolnir.js@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/mjolnir.js/-/mjolnir.js-2.1.2.tgz#db89819c418b6f3d200b1c51386fc7487f98bd5a"
   dependencies:
     "@babel/runtime" "^7.0.0"
     hammerjs "^2.0.8"
 
-mjolnir.js@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/mjolnir.js/-/mjolnir.js-2.1.2.tgz#db89819c418b6f3d200b1c51386fc7487f98bd5a"
+mjolnir.js@^2.2.0:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/mjolnir.js/-/mjolnir.js-2.2.1.tgz#84fc2352ff2ec58b061b0dab1a5ec67f3d2ad966"
   dependencies:
     "@babel/runtime" "^7.0.0"
     hammerjs "^2.0.8"
@@ -7342,14 +7339,14 @@ react-lifecycles-compat@^3.0.0:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
 
-react-map-gl@^4.0.14:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/react-map-gl/-/react-map-gl-4.1.2.tgz#02b5d983c4d08be2f2d8e3ea2b58c87e4ac25ed3"
+react-map-gl@^5.0.3:
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/react-map-gl/-/react-map-gl-5.0.8.tgz#9303357d1b0bc430aa65df190995863c15bdff8d"
   dependencies:
     "@babel/runtime" "^7.0.0"
-    mapbox-gl "~0.53.0"
-    mjolnir.js "^2.1.0"
-    prop-types "^15.5.7"
+    mapbox-gl "^1.0.0"
+    mjolnir.js "^2.2.0"
+    prop-types "^15.7.2"
     react-virtualized-auto-sizer "^1.0.2"
     viewport-mercator-project "^6.1.0"
 
@@ -8661,12 +8658,6 @@ subarg@^1.0.0:
   resolved "https://registry.yarnpkg.com/subarg/-/subarg-1.0.0.tgz#f62cf17581e996b48fc965699f54c06ae268b8d2"
   dependencies:
     minimist "^1.1.0"
-
-supercluster@^3.0.0:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/supercluster/-/supercluster-3.0.3.tgz#3b7c86bbc8f56ecf35b923a4f5675676ed52e2cb"
-  dependencies:
-    kdbush "^1.0.1"
 
 supercluster@^6.0.1:
   version "6.0.1"
