@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import {notNullorUndefined, unique} from './data-utils';
+import {notNullorUndefined, unique, numberSort} from './data-utils';
 import {extent} from 'd3-array';
 
 /**
@@ -28,7 +28,7 @@ import {extent} from 'd3-array';
  * @param {function | undefined} sortFunc
  * @returns {array} domain
  */
-export function getQuantileDomain(data, valueAccessor, sortFunc) {
+export function getQuantileDomain(data, valueAccessor, sortFunc = numberSort) {
   const values =
     typeof valueAccessor === 'function' ? data.map(valueAccessor) : data;
 

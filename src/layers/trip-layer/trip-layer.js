@@ -171,9 +171,14 @@ export default class TripLayer extends Layer {
     return allData[object.properties.index];
   }
 
+  calculateDataAttribute({allData, filteredIndex}, getPosition) {
+    return filteredIndex
+    .map(i => this.dataToFeature[i])
+    .filter(d => d && d.geometry.type === 'LineString');
+  }
   // TODO: fix complexity
   /* eslint-disable complexity */
-  formatLayerData(_, allData, filteredIndex, oldLayerData, opt = {}) {
+  formatLayerData(datasets, oldLayerData, opt = {}) {
     // to-do: parse segment from allData
     const {
       colorScale,
@@ -187,32 +192,8 @@ export default class TripLayer extends Layer {
     } = this.config;
 
     const {stroked, colorRange, sizeRange} = visConfig;
-
-    const getFeature = this.getPositionAccessor(this.config.column);
-
-    // geojson feature are object, if doesn't exists
-    // create it and save to layer
-    if (!oldLayerData || oldLayerData.getFeature !== getFeature) {
-      this.updateLayerMeta(allData, getFeature);
-    }
-
-    let geojsonData;
-
-    if (
-      oldLayerData &&
-      oldLayerData.data &&
-      opt.sameData &&
-      oldLayerData.getFeature === getFeature
-    ) {
-      // no need to create a new array of data
-      // use updateTriggers to selectively re-calculate attributes
-      geojsonData = oldLayerData.data;
-    } else {
-      // filteredIndex is a reference of index in allData which can map to feature
-      geojsonData = filteredIndex
-        .map(i => this.dataToFeature[i])
-        .filter(d => d && d.geometry.type === 'LineString');
-    }
+    const {allData, gpuFilter} = datasets[this.config.dataId];
+    const {data} = this.updateData(datasets, oldLayerData);
 
     // color
     const cScale =
@@ -228,9 +209,16 @@ export default class TripLayer extends Layer {
       sizeField &&
       stroked &&
       this.getVisChannelScale(sizeScale, sizeDomain, sizeRange);
+    // access feature properties from geojson sub layer
+    const getDataForGpuFilter = f => allData[f.properties.index];
+    const getIndexForGpuFilter = f => f.properties.index;
 
     return {
-      data: geojsonData,
+      data,
+      getFilterValue: gpuFilter.filterValueAccessor(
+        getIndexForGpuFilter,
+        getDataForGpuFilter
+      ),
       getPath: d => d.geometry.coordinates,
       getTimestamps: d => this.dataToTimeStamp[d.properties.index],
       getColor: d =>
@@ -292,7 +280,13 @@ export default class TripLayer extends Layer {
     return this;
   }
 
-  renderLayer({data, idx, mapState, animationConfig}) {
+  renderLayer(opts) {
+    const {
+      data,
+      gpuFilter,
+      mapState,
+      animationConfig
+    } = opts;
     const {visConfig} = this.config;
     const zoomFactor = this.getZoomFactor(mapState);
 
@@ -310,26 +304,19 @@ export default class TripLayer extends Layer {
       getTimestamps: {
         columns: this.config.columns,
         domain0: animationConfig.domain[0]
-      }
+      },
+      getFilterValue: gpuFilter.filterValueUpdateTriggers
     };
+    const defaultLayerProps = this.getDefaultDeckLayerProps(opts);
 
     return [
       new DeckGLTripsLayer({
-        id: this.id,
-        idx,
-        data: data.data,
-        getPath: data.getPath,
-        getColor: data.getColor,
+        ...defaultLayerProps,
+        ...data,
         getTimestamps: d =>
           data.getTimestamps(d).map(ts => ts - animationConfig.domain[0]),
-        opacity: this.config.visConfig.opacity,
         widthScale: this.config.visConfig.thickness * zoomFactor * 8,
-        highlightColor: this.config.highlightColor,
-
-        getWidth: data.getWidth,
         rounded: true,
-        pickable: true,
-        autoHighlight: true,
         parameters: {
           depthTest: mapState.dragRotate,
           depthMask: false

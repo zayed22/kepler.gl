@@ -40,7 +40,6 @@ export function cmpFilters(
     typeof expectedFilter,
     'filters should be same type'
   );
-
   if (Array.isArray(expectedFilter) && Array.isArray(actualFilter)) {
     t.equal(
       actualFilter.length,
@@ -189,6 +188,11 @@ export function cmpDataset(t, expectedDataset, actualDataset, opt = {}) {
     } else if (key === 'gpuFilter') {
       // test gpuFilter props
       cmpGpuFilterProp(t, expectedDataset.gpuFilter, actualDataset.gpuFilter);
+    } else if (key === 'filterRecord') {
+      cmpObjectKeys(t, expectedDataset.filterRecord, actualDataset.filterRecord, 'dataset.filterRecord');
+      Object.keys(expectedDataset.filterRecord).forEach(item => {
+        cmpFilters(t, expectedDataset.filterRecord[item], actualDataset.filterRecord[item]);
+      })
     } else if (key !== 'color' || opt.color) {
       t.deepEqual(
         actualDataset[key],

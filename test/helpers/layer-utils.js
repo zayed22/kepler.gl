@@ -19,8 +19,10 @@
 // THE SOFTWARE.
 
 import {LayerManager} from 'deck.gl';
+import React from 'react';
 import {gl} from '@deck.gl/test-utils';
 import sinon from 'sinon';
+import {mount} from 'enzyme';
 import {console as Console} from 'global/window';
 import cloneDeep from 'lodash.clonedeep';
 
@@ -40,9 +42,11 @@ import csvData, {
   dataWithNulls as csvDataWithNulls,
   wktCsv
 } from 'test/fixtures/test-csv-data';
+import testLayerData, {bounds} from 'test/fixtures/test-layer-data';
 import {geojsonData} from 'test/fixtures/geojson';
 import {logStep} from '../../scripts/log';
 
+export {fieldDomain, iconGeometry} from 'test/fixtures/test-layer-data';
 // Initialize gl once
 onWebGLInitialized(gl);
 
@@ -57,7 +61,8 @@ export function testCreateLayer(t, LayerClass, props = {}) {
   return layer;
 }
 
-export function testCreateLayerFromConfig(t, datasets, layerConfig = {}) {
+export function testCreateLayerFromConfig(t, tc) {
+  const {datasets, layer: layerConfig = {}} = tc;
   let layer;
 
   t.doesNotThrow(() => {
@@ -68,6 +73,9 @@ export function testCreateLayerFromConfig(t, datasets, layerConfig = {}) {
       `${layerConfig.type} layer created`
     );
     layer.updateLayerDomain(datasets);
+    if (tc.afterLayerInitialized) {
+      tc.afterLayerInitialized(layer);
+    }
   }, `create a ${layerConfig.type} layer from config should not fail`);
 
   return layer;
@@ -88,6 +96,19 @@ export function testFormatLayerData(t, layer, datasets) {
 export function testCreateCases(t, LayerClass, testCases) {
   testCases.forEach(tc => {
     const layer = testCreateLayer(t, LayerClass, tc.props);
+    if (layer) {
+      t.ok(typeof layer.type === 'string', 'layer type should be string');
+      t.ok(typeof layer.id === 'string', 'layer id should be string');
+      t.doesNotThrow(() => {
+        mount(<layer.layerIcon/>);
+      }, 'layer icon should be mountable');
+
+      if (layer.layerInfoModal) {
+        t.doesNotThrow(() => {
+          mount(<layer.layerInfoModal.template/>);
+        }, 'layer info modal should be mountable');
+      }
+    }
     if (layer && tc.test) {
       tc.test(layer);
     }
@@ -108,7 +129,7 @@ export function testUpdateLayer(t, layer, updateMethod, updateArgs) {
 export function testFormatLayerDataCases(t, LayerClass, testCases) {
   testCases.forEach(tc => {
     logStep(`---> Test Format Layer Data ${tc.name}`);
-    const layer = testCreateLayerFromConfig(t, tc.datasets, tc.layer);
+    const layer = testCreateLayerFromConfig(t, tc);
     let updatedLayer = layer;
 
     // if provided updates
@@ -143,7 +164,7 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
   testCases.forEach(tc => {
     logStep(`---> Test Render Layer ${tc.name}`);
 
-    const layer = testCreateLayerFromConfig(t, tc.datasets, tc.layer);
+    const layer = testCreateLayerFromConfig(t, tc);
     let result;
     let deckLayers;
 
@@ -157,7 +178,8 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
           idx: 0,
           layerInteraction: {},
           mapState: INITIAL_MAP_STATE,
-          gpuFilter: getGpuFilterProps([], 'test_data_idtest'),
+          gpuFilter: tc.datasets[layer.config.dataId].gpuFilter ||
+            getGpuFilterProps([], layer.config.dataId),
           interactionConfig: INITIAL_VIS_STATE.interactionConfig,
           ...(tc.renderArgs || {})
         });
@@ -172,7 +194,7 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
       );
 
       if (tc.assert) {
-        tc.assert(initialDeckLayers, layer);
+        tc.assert(initialDeckLayers, layer, result);
       }
     }
   });
@@ -253,24 +275,37 @@ function addFilterToData(data, id, filters) {
 }
 
 export const {rows, fields} = processCsvData(csvData);
+export const {rows: testRows, fields: testFields} = processCsvData(testLayerData);
+
 export const {rows: rowsWithNull, fields: fieldsWithNull} = processCsvData(
   csvDataWithNulls
 );
 export const dataId = '0dj3h';
+export {
+  dataId as tripDataId,
+  fields as tripFields,
+  rows as tripRows
+} from 'test/fixtures/test-trip-data';
+
 const gpuTimeFilter = [
-  {name: 'gps_data.utc_timestamp', value: [1474071095000, 1474071608000]}
+  {name: 'utc_timestamp', value: [
+    1474071095000,
+    1474071608000
+  ]}
 ];
 
 export const preparedDataset = addFilterToData(
-  {fields, rows},
+  {fields: testFields, rows: testRows},
   dataId,
   gpuTimeFilter
 ).datasets[dataId];
-export const preparedDatasetWithNull = addFilterToData(
-  {rows: rowsWithNull, fields: fieldsWithNull},
-  dataId,
-  gpuTimeFilter
-).datasets[dataId];
+
+export const pointLayerMeta = {
+  bounds: bounds['lat-lng']
+}
+export const arcLayerMeta = {
+  bounds: bounds.arc
+}
 
 export const {rows: geoCsvRows, fields: geoCsvFields} = processCsvData(wktCsv);
 export const {rows: geoJsonRows, fields: geoJsonFields} = processGeojson(cloneDeep(geojsonData));

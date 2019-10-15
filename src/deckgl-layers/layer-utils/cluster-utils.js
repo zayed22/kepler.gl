@@ -21,8 +21,10 @@
 import Supercluster from 'supercluster';
 import memoize from 'lodash.memoize';
 
-export function getGeoJSON(data, getPosition) {
-  return data
+export function getGeoJSON(data, getPosition, filterData) {
+  const raw = typeof filterData === 'function' ? data.filter(filterData) : data;
+
+  return raw
     .map(d => ({
       type: 'Point',
       properties: {
@@ -40,28 +42,38 @@ export function getGeoJSON(data, getPosition) {
 
 const clusterResolver = ({clusterRadius}) => `${clusterRadius}`;
 
-const getClusterer = memoize(({clusterRadius, geoJSON}) => {
+const getClusterer = ({clusterRadius, geoJSON}) => {
   return new Supercluster({
     maxZoom: 20,
     radius: clusterRadius,
     reduce: (accumulated, props) => {
-      if (props.points) {
-        // avoid using spread to prevent max call stack exceeded error
-        props.points.forEach(p => {
-          accumulated.points.push(p);
-        });
-      } else {
-        accumulated.points.push(props);
-      }
-    }
+      accumulated.points = [...accumulated.points, ...props.points]
+    },
+    map: props => ({points: [props.data]})
   }).load(geoJSON);
-}, clusterResolver);
-
-export function clustersAtZoom({bbox, clusterRadius, geoJSON, zoom}) {
-  const clusterer = getClusterer({clusterRadius, geoJSON});
-  return clusterer.getClusters(bbox, zoom);
 }
 
-export function clearClustererCache() {
-  getClusterer.cache.clear();
+export default class ClusterBuilder {
+  constructor() {
+    this.clusterer = memoize(getClusterer, clusterResolver);
+  }
+
+  clustersAtZoom({bbox, clusterRadius, geoJSON, zoom}) {
+    const clusterer = this.clusterer({clusterRadius, geoJSON});
+
+    // map clusters to formatted bins to be passed to deck.gl bin-sorter
+    const clusters =
+      clusterer.getClusters(bbox, zoom)
+      .map((c, i) => ({
+        points: c.properties.points,
+        position: c.geometry.coordinates,
+        index: i
+      }));
+
+    return clusters;
+  }
+
+  clearClustererCache() {
+    this.clusterer.cache.clear();
+  }
 }

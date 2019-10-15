@@ -936,9 +936,9 @@ export const testAllData = [
 export default data;
 
 export const updatedLayerV2 = {
-  dataToFeature: {
-    0: null,
-    1: {
+  dataToFeature: [
+    null,
+    {
       type: 'Feature',
       properties: {
         index: 1
@@ -954,7 +954,7 @@ export const updatedLayerV2 = {
         ]
       }
     },
-    2: {
+    {
       type: 'Feature',
       properties: {
         index: 2
@@ -964,7 +964,7 @@ export const updatedLayerV2 = {
         coordinates: [[[-74.387589, 40.632238], [-74.387589, 40.632238]]]
       }
     },
-    3: {
+    {
       type: 'Feature',
       properties: {
         index: 3
@@ -980,7 +980,7 @@ export const updatedLayerV2 = {
         ]
       }
     },
-    4: {
+    {
       type: 'Feature',
       properties: {
         index: 4
@@ -1000,7 +1000,7 @@ export const updatedLayerV2 = {
         ]
       }
     },
-    5: {
+    {
       type: 'Feature',
       properties: {
         index: 5
@@ -1016,7 +1016,7 @@ export const updatedLayerV2 = {
         ]
       }
     }
-  },
+  ],
   meta: {
     featureTypes: {polygon: true},
     bounds: [-74.593264, 40.632238, -74.148473, 41.091647],
@@ -1124,4 +1124,6 @@ export const updatedLayerSimplifiedShape = {
     fixedRadius: false
   }
 };
+
 /* eslint-enable max-lens */
+

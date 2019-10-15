@@ -21,13 +21,13 @@
 import uniq from 'lodash.uniq';
 
 import Layer, {colorMaker} from '../base-layer';
-import {GeoJsonLayer as DeckGLGeoJsonLayer} from 'deck.gl';
-import GeojsonSubLayers from 'deckgl-layers/geojson-layer/geojson-sub-layer';
+import {GeoJsonLayer as DeckGLGeoJsonLayer} from '@deck.gl/layers';
 import {hexToRgb} from 'utils/color-utils';
 import {
   getGeojsonDataMaps,
   getGeojsonBounds,
-  getGeojsonFeatureTypes
+  getGeojsonFeatureTypes,
+  parseGeoJsonRawFeature
 } from './geojson-utils';
 import GeojsonLayerIcon from './geojson-layer-icon';
 import {
@@ -35,6 +35,7 @@ import {
   HIGHLIGH_COLOR_3D,
   CHANNEL_SCALES
 } from 'constants/default-settings';
+import {findFirstNoneEmpty} from 'utils/data-utils';
 
 export const geojsonVisConfigs = {
   opacity: 'opacity',
@@ -66,12 +67,8 @@ export const geojsonVisConfigs = {
 export const geoJsonRequiredColumns = ['geojson'];
 export const featureAccessor = ({geojson}) => d => d[geojson.fieldIdx];
 export const defaultElevation = 500;
-/**
- * From Deck.gl geojson layer
- * Returns the source feature that was passed to `separateGeojsonFeatures`
- * feature provided by the user is under `sourceFeature.feature`
- */
-const unwrapSourceFeature = (wrappedFeature) => wrappedFeature.sourceFeature.feature;
+export const defaultLineWidth = 1;
+export const defaultRadius = 1;
 
 export default class GeoJsonLayer extends Layer {
   constructor(props) {
@@ -142,11 +139,16 @@ export default class GeoJsonLayer extends Layer {
     return this.getFeature(this.config.columns);
   }
 
-  static findDefaultLayerProps({label, fields = []}) {
-    const geojsonColumns = fields.filter(f => f.type === 'geojson').map(f => f.name);
+  static findDefaultLayerProps({label, fields = [], allData = []}) {
+    const geojsonColumns = fields.filter(f => f.type === 'geojson')
+    // since geojson column can be object or array. test if column contains valid geojson
+    const validGeojsonColumns = geojsonColumns.filter(f => {
+      const sample = findFirstNoneEmpty(allData, 10,  d => d[f.tableFieldIndex - 1]);
+      return sample.length && sample.every(parseGeoJsonRawFeature)
+    }).map(f => f.name);
 
     const defaultColumns = {
-      geojson: uniq([...GEOJSON_FIELDS.geojson, ...geojsonColumns])
+      geojson: uniq([...GEOJSON_FIELDS.geojson, ...validGeojsonColumns])
     };
 
     const foundColumns = this.findDefaultColumnField(defaultColumns, fields);
@@ -190,7 +192,7 @@ export default class GeoJsonLayer extends Layer {
     return allData[object.properties.index];
   }
 
-  calculateDataAttribute(allData, filteredIndex, getPosition) {
+  calculateDataAttribute({allData, filteredIndex}, getPosition) {
     return filteredIndex
       .map(i => this.dataToFeature[i])
       .filter(d => d);
@@ -229,8 +231,8 @@ export default class GeoJsonLayer extends Layer {
       strokeColor
     } = visConfig;
 
-    const {filteredIndex, allData, gpuFilter} = datasets[this.config.dataId];
-    const {data} = this.updateData(allData, filteredIndex, oldLayerData);
+    const {allData, gpuFilter} = datasets[this.config.dataId];
+    const {data} = this.updateData(datasets, oldLayerData);
 
     // fill color
     const cScale =
@@ -249,6 +251,7 @@ export default class GeoJsonLayer extends Layer {
         strokeColorDomain,
         strokeColorRange.colors.map(hexToRgb)
       );
+
     // calculate stroke scale - if stroked = true
     const sScale =
       sizeField &&
@@ -266,8 +269,8 @@ export default class GeoJsonLayer extends Layer {
       radiusField && this.getVisChannelScale(radiusScale, radiusDomain, radiusRange);
 
     // access feature properties from geojson sub layer
-    const getDataForGpuFilter = f => allData[unwrapSourceFeature(f).properties.index];
-    const getIndexForGpuFilter = f => unwrapSourceFeature(f).properties.index;
+    const getDataForGpuFilter = f => allData[f.properties.index];
+    const getIndexForGpuFilter = f => f.properties.index;
 
     return {
       data,
@@ -299,7 +302,7 @@ export default class GeoJsonLayer extends Layer {
               sizeField,
               0
             )
-          : d.properties.lineWidth || 1,
+          : d.properties.lineWidth || defaultLineWidth,
       getElevation: d =>
         eScale
           ? this.getEncodedChannelValue(
@@ -317,7 +320,7 @@ export default class GeoJsonLayer extends Layer {
               radiusField,
               0
             )
-          : d.properties.radius || 1
+          : d.properties.radius || defaultRadius
     };
   }
   /* eslint-enable complexity */
@@ -329,7 +332,6 @@ export default class GeoJsonLayer extends Layer {
 
     // get bounds from features
     const bounds = getGeojsonBounds(this.dataToFeature);
-
     // if any of the feature has properties.radius set to be true
     const fixedRadius = Boolean(
       this.dataToFeature.find(d => d && d.properties && d.properties.radius)
@@ -361,20 +363,24 @@ export default class GeoJsonLayer extends Layer {
     return this;
   }
 
-  renderLayer({data, idx, gpuFilter, objectHovered, mapState, interactionConfig}) {
+  renderLayer(opts) {
+    const {
+      data,
+      gpuFilter,
+      objectHovered,
+      mapState
+    } = opts;
+
     const {fixedRadius} = this.meta;
     const radiusScale = this.getRadiusScaleByZoom(mapState, fixedRadius);
     const zoomFactor = this.getZoomFactor(mapState);
     const {visConfig} = this.config;
 
     const layerProps = {
-      // multiplier applied just so it being consistent with previously saved maps
       lineWidthScale: visConfig.thickness * zoomFactor * 8,
       elevationScale: visConfig.elevationScale,
       pointRadiusScale: radiusScale,
-      lineMiterLimit: 4,
-      radiusMinPixels: 0,
-      ...gpuFilter
+      lineMiterLimit: 4
     };
 
     const updateTriggers = {
@@ -402,64 +408,40 @@ export default class GeoJsonLayer extends Layer {
       getRadius: {
         radiusField: this.config.radiusField,
         radiusRange: visConfig.radiusRange
-      }
+      },
+      getFilterValue: gpuFilter.filterValueUpdateTriggers
     };
 
-    const subLayerProps = Object.entries(GeojsonSubLayers).reduce((accu, [key, value]) => ({
-      ...accu,
-      [key]: {
-        ...value,
-        getFilterValue: data.getFilterValue,
-        filterRange: gpuFilter.filterRange,
-        updateTriggers: {
-          getFilterValue: gpuFilter.filterValueUpdateTriggers
-        }
-      }
-    }), {});
+    const defaultLayerProps = this.getDefaultDeckLayerProps(opts);
 
     return [
       new DeckGLGeoJsonLayer({
+        ...defaultLayerProps,
         ...layerProps,
-        id: this.id,
-        idx,
-        data: data.data,
-        getFillColor: data.getFillColor,
-        getLineColor: data.getLineColor,
-        getLineWidth: data.getLineWidth,
-        getRadius: data.getRadius,
-        getElevation: data.getElevation,
-        // highlight
-        pickable: true,
+        ...data,
         highlightColor: HIGHLIGH_COLOR_3D,
         autoHighlight: visConfig.enable3d,
-        // parameters
-        parameters: {
-          depthTest: Boolean(visConfig.enable3d || mapState.dragRotate)
-        },
-        opacity: visConfig.opacity,
         stroked: visConfig.stroked,
         filled: visConfig.filled,
         extruded: visConfig.enable3d,
         wireframe: visConfig.wireframe,
         lineMiterLimit: 2,
         rounded: true,
-        updateTriggers,
-        _subLayerProps: subLayerProps
+        updateTriggers
       }),
       ...(this.isLayerHovered(objectHovered) && !visConfig.enable3d
         ? [
             new DeckGLGeoJsonLayer({
+              ...this.getDefaultHoverLayerProps(),
               ...layerProps,
-              id: `${this.id}-hovered`,
               data: [objectHovered.object],
               getLineWidth: data.getLineWidth,
               getRadius: data.getRadius,
               getElevation: data.getElevation,
               getLineColor: this.config.highlightColor,
               getFillColor: this.config.highlightColor,
-              updateTriggers,
+              // always draw outline
               stroked: true,
-              pickable: false,
               filled: false
             })
           ]

@@ -189,7 +189,7 @@ test('Components -> DataTableModal.render: csv', t => {
 
   const expectedRows = {
     0: [
-      '{"type":"Feature","properties":{"fillColor":[1,2,3],"lineColor":[4,5,6],"lineWidth":1,"elevation":10,"radius":5},"geometry":{"type":"Point","coordinates":[[-122,37]]}}',
+      '{"type":"Feature","properties":{"fillColor":[1,2,3],"lineColor":[4,5,6],"lineWidth":1,"elevation":10,"radius":5},"geometry":{"type":"Point","coordinates":[-122.1,37.3]}}',
       '[1,2,3]',
       '[4,5,6]',
       '1',
@@ -197,7 +197,7 @@ test('Components -> DataTableModal.render: csv', t => {
       '5'
     ],
     1: [
-      '{"type":"Feature","properties":{"fillColor":[7,8,9],"lineColor":[4,5,6],"lineWidth":3,"elevation":10,"radius":5},"geometry":{"type":"Point","coordinates":[[-122,37]]}}',
+      '{"type":"Feature","properties":{"fillColor":[7,8,9],"lineColor":[4,5,6],"lineWidth":3,"elevation":10,"radius":5},"geometry":{"type":"Point","coordinates":[-122.2,37.2]}}',
       '[7,8,9]',
       '[4,5,6]',
       '3',
@@ -205,7 +205,7 @@ test('Components -> DataTableModal.render: csv', t => {
       '5'
     ],
     2: [
-      '{"type":"Feature","properties":{"fillColor":[1,2,3],"lineColor":[4,5,6],"lineWidth":4,"elevation":10,"radius":5},"geometry":{"type":"Point","coordinates":[[-122,37]]}}',
+      '{"type":"Feature","properties":{"fillColor":[1,2,3],"lineColor":[4,5,6],"lineWidth":4,"elevation":10,"radius":5},"geometry":{"type":"Point","coordinates":[-122.3,37.1]}}',
       '[1,2,3]',
       '[4,5,6]',
       '4',
