@@ -33,12 +33,7 @@ export const iconPosAccessor = ({lat, lng}) => d => [
   d.data[lng.fieldIdx],
   d.data[lat.fieldIdx]
 ];
-<<<<<<< HEAD
 
-export const iconPosResolver = ({lat, lng}) => `${lat.fieldIdx}-${lng.fieldIdx}`;
-
-=======
->>>>>>> [Feat] Gpu data filter 4 (#604)
 export const iconAccessor = ({icon}) => d => d.data[icon.fieldIdx];
 
 export const iconRequiredColumns = ['lat', 'lng', 'icon'];
