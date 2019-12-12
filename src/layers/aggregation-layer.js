@@ -301,8 +301,6 @@ export default class AggregationLayer extends Layer {
     const {gpuFilter, mapState, layerCallbacks} = opts;
     const {visConfig} = this.config;
     const eleZoomFactor = this.getElevationZoomFactor(mapState);
-    console.log(Math.pow(2, Math.max(8 - mapState.zoom, 0)));
-    console.log('eleZoomFactor', eleZoomFactor)
     const updateTriggers = {
       getColorValue: {
         colorField: this.config.colorField,
