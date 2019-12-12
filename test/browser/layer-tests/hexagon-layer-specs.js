@@ -224,7 +224,7 @@ test('#HexagonLayer -> formatLayerData', t => {
   t.end();
 });
 
-test.only('#HexagonLayer -> renderLayer', t => {
+test('#HexagonLayer -> renderLayer', t => {
   const filteredIndex = [0, 1, 2, 4, 5, 7];
   const spyLayerCallbacks = sinon.spy();
 

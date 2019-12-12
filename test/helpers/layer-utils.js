@@ -30,7 +30,6 @@ import {INITIAL_MAP_STATE} from 'reducers/map-state-updaters';
 import {INITIAL_VIS_STATE} from 'reducers/vis-state-updaters';
 import * as VisStateActions from 'actions/vis-state-actions';
 
-import {onWebGLInitialized} from 'utils/gl-utils';
 import {colorMaker, layerColors} from 'layers/base-layer';
 import {getGpuFilterProps} from 'utils/gpu-filter-utils';
 import {validateLayerWithData} from 'reducers/vis-state-merger';
@@ -48,7 +47,6 @@ import {logStep} from '../../scripts/log';
 
 export {fieldDomain, iconGeometry} from 'test/fixtures/test-layer-data';
 // Initialize gl once
-onWebGLInitialized(gl);
 
 export function testCreateLayer(t, LayerClass, props = {}) {
   let layer;
@@ -287,18 +285,23 @@ export {
   rows as tripRows
 } from 'test/fixtures/test-trip-data';
 
-const gpuTimeFilter = [
+const timeFilter = [
   {name: 'utc_timestamp', value: [
     1474071095000,
     1474071608000
   ]}
 ];
 
-export const preparedDataset = addFilterToData(
+const stateWithTimeFilter = addFilterToData(
   {fields: testFields, rows: testRows},
   dataId,
-  gpuTimeFilter
-).datasets[dataId];
+  timeFilter
+);
+
+export const preparedDataset = stateWithTimeFilter.datasets[dataId];
+export const gpuTimeFilter = stateWithTimeFilter.filters[0];
+
+export const preparedFilterDomain0 = gpuTimeFilter.domain[0];
 
 export const pointLayerMeta = {
   bounds: bounds['lat-lng']
@@ -310,18 +313,27 @@ export const arcLayerMeta = {
 export const {rows: geoCsvRows, fields: geoCsvFields} = processCsvData(wktCsv);
 export const {rows: geoJsonRows, fields: geoJsonFields} = processGeojson(cloneDeep(geojsonData));
 
-export const preparedGeoDataset = addFilterToData(
+const stateWithGeoFilter = addFilterToData(
   {fields: geoCsvFields, rows: geoCsvRows},
   dataId,
   [
     {name: 'm_rate', value: [7, 10]}
   ]
-).datasets[dataId];
+)
 
-export const prepareGeojsonDataset = addFilterToData(
+export const preparedGeoDataset = stateWithGeoFilter.datasets[dataId];
+export const preparedGeoDatasetFilter = stateWithGeoFilter.filters[0];
+
+const stateWithGeojsonFilter = addFilterToData(
   {fields: geoJsonFields, rows: geoJsonRows},
   dataId,
   [
     {name: 'TRIPS', value: [4, 12]}
   ]
-).datasets[dataId];
+);
+
+
+export const prepareGeojsonDataset = stateWithGeojsonFilter.datasets[dataId];
+export const prepareGeojsonDatasetFilter = stateWithGeojsonFilter.filters[0];
+export const geoFilterDomain0 = preparedGeoDatasetFilter.domain[0];
+export const geojsonFilterDomain0 = prepareGeojsonDatasetFilter.domain[0];

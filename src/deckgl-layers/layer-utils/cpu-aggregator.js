@@ -1,7 +1,4 @@
-/* eslint-disable no-undef */
-/* eslint-disable no-console */
-/* eslint-disable no-invalid-this */
-// Copyright (c) 2015 - 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-import {experimental, AGGREGATION_OPERATION} from '@deck.gl/aggregation-layers';
 
+/* eslint-disable guard-for-in */
+import {experimental, AGGREGATION_OPERATION} from '@deck.gl/aggregation-layers';
 import {aggregate} from 'utils/aggregate-utils';
 import {AGGREGATION_TYPES, SCALE_FUNC} from 'constants/default-settings';
 
@@ -71,7 +69,7 @@ export function getDimensionSortedBins(step, props, dimensionUpdater) {
 
   const sortedBins = new BinSorter(this.state.layerData.data || [], {
     getValue,
-    filterData: props.filterData
+    filterData: props._filterData
   });
   this._setDimensionState(key, {sortedBins});
 }
@@ -224,9 +222,9 @@ export const defaultColorDimension = {
     {
       key: 'getBins',
       triggers: {
-        filterData: {
-          prop: 'filterData',
-          updateTrigger: 'filterData'
+        _filterData: {
+          prop: '_filterData',
+          updateTrigger: '_filterData'
         }
       },
       updater: getDimensionSortedBins
@@ -291,9 +289,9 @@ export const defaultElevationDimension = {
     {
       key: 'getBins',
       triggers: {
-        filterData: {
-          prop: 'filterData',
-          updateTrigger: 'filterData'
+        _filterData: {
+          prop: '_filterData',
+          updateTrigger: '_filterData'
         }
       },
       updater: getDimensionSortedBins

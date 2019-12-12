@@ -118,10 +118,12 @@ const getFilterValueAccessor = channels => (
       return 0;
     }
     const value = filter.mappedValue
-      ? filter.mappedValue[getIndex(d)] - filter.domain[0]
-      : getData(d)[filter.fieldIdx] - filter.domain[0];
+      ? filter.mappedValue[getIndex(d)]
+      : getData(d)[filter.fieldIdx];
 
-    return notNullorUndefined(value) ? value : Number.MIN_SAFE_INTEGER;
+    return notNullorUndefined(value)
+      ? value - filter.domain[0]
+      : Number.MIN_SAFE_INTEGER;
   });
 
 /**

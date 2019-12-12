@@ -3991,7 +3991,7 @@ export const sampleTripDataConfig = {
             },
             isVisible: true
           }
-        },
+        }
         // {
         //   type: 'point',
         //   config: {

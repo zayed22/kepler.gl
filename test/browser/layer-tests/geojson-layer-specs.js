@@ -19,7 +19,11 @@
 // THE SOFTWARE.
 
 import test from 'tape';
-import GeojsonLayer, {defaultElevation, defaultLineWidth, defaultRadius} from 'layers/geojson-layer/geojson-layer';
+import GeojsonLayer, {
+  defaultElevation,
+  defaultLineWidth,
+  defaultRadius
+} from 'layers/geojson-layer/geojson-layer';
 
 import {
   updatedLayerSimplifiedShape,
@@ -31,11 +35,20 @@ import {
   testCreateCases,
   testFormatLayerDataCases,
   testRenderLayerCases,
-  prepareGeojsonDataset
+  prepareGeojsonDataset,
+  geoFilterDomain0,
+  geojsonFilterDomain0
 } from 'test/helpers/layer-utils';
-import {updatedGeoJsonLayer, geoJsonWithStyle, geoStyleDataToFeature, geoStyleMeta} from 'test/fixtures/geojson';
+import {
+  updatedGeoJsonLayer,
+  geoJsonWithStyle,
+  geoStyleDataToFeature,
+  geoStyleMeta
+} from 'test/fixtures/geojson';
 import {createNewDataEntry} from 'utils/dataset-utils';
 import {processGeojson} from 'processors/data-processor';
+
+//
 
 test('#GeojsonLayer -> constructor', t => {
   const TEST_CASES = {
@@ -64,6 +77,7 @@ test('#GeojsonLayer -> constructor', t => {
 
 test('#GeojsonLayer -> formatLayerData', t => {
   const filteredIndex = [0, 2, 4];
+
   const TEST_CASES = [
     {
       name: 'Geojson wkt polygon.1',
@@ -128,7 +142,10 @@ test('#GeojsonLayer -> formatLayerData', t => {
         );
         t.deepEqual(
           layerData.data.map(layerData.getFilterValue),
-          [[Number.MIN_SAFE_INTEGER, 0, 0, 0], [10, 0, 0, 0]],
+          [
+            [Number.MIN_SAFE_INTEGER, 0, 0, 0],
+            [10 - geoFilterDomain0, 0, 0, 0]
+          ],
           'getFilterValue should return correct value'
         );
         t.deepEqual(
@@ -183,8 +200,12 @@ test('#GeojsonLayer -> formatLayerData', t => {
             }
           },
           // color by c_zip_type(string)
-          colorField: preparedGeoDataset.fields.find(f => f.name === 'c_zip_type'),
-          strokeColorField: preparedGeoDataset.fields.find(f => f.name === 'c_zip_type'),
+          colorField: preparedGeoDataset.fields.find(
+            f => f.name === 'c_zip_type'
+          ),
+          strokeColorField: preparedGeoDataset.fields.find(
+            f => f.name === 'c_zip_type'
+          ),
 
           // stroke by c_number(real)
           sizeField: preparedGeoDataset.fields.find(f => f.name === 'c_number'),
@@ -234,7 +255,7 @@ test('#GeojsonLayer -> formatLayerData', t => {
           // by a_zip
           // [7014, 7023, 7416] -> [0, 500]
           layerData.data.map(layerData.getElevation),
-          [0, 9/402*500, 500],
+          [0, (9 / 402) * 500, 500],
           'getElevation should return correct value'
         );
         t.deepEqual(
@@ -249,7 +270,11 @@ test('#GeojsonLayer -> formatLayerData', t => {
           // by m_rate
           // 7.5 null 10
           layerData.data.map(layerData.getFilterValue),
-          [[7.5, 0, 0, 0], [Number.MIN_SAFE_INTEGER, 0, 0, 0], [10, 0, 0, 0]],
+          [
+            [7.5 - geoFilterDomain0, 0, 0, 0],
+            [Number.MIN_SAFE_INTEGER, 0, 0, 0],
+            [10 - geoFilterDomain0, 0, 0, 0]
+          ],
           'getFilterValue should return correct value'
         );
         t.deepEqual(
@@ -350,7 +375,11 @@ test('#GeojsonLayer -> formatLayerData', t => {
         );
         t.deepEqual(
           layerData.data.map(layerData.getFilterValue),
-          [[11, 0, 0, 0], [20, 0, 0, 0], [Number.MIN_SAFE_INTEGER, 0, 0, 0]],
+          [
+            [11 - geojsonFilterDomain0, 0, 0, 0],
+            [20 - geojsonFilterDomain0, 0, 0, 0],
+            [Number.MIN_SAFE_INTEGER, 0, 0, 0]
+          ],
           'getFilterValue should return correct value'
         );
         t.deepEqual(
@@ -526,20 +555,62 @@ test('#GeojsonLayer -> renderLayer', t => {
 
         // test instanceFilterValues
         const expectedFilterValues = new Float32Array([
-          11, 0, 0, 0, // 0
-          11, 0, 0, 0, // 4
-          11, 0, 0, 0, // 8
-          11, 0, 0, 0, // 12
-          11, 0, 0, 0, // 16
-          11, 0, 0, 0, // 20
-          20, 0, 0, 0, // 24
-          20, 0, 0, 0, // 28
-          20, 0, 0, 0, // 32
-          20, 0, 0, 0, // 36
-          Number.MIN_SAFE_INTEGER, 0, 0, 0, // 40
-          Number.MIN_SAFE_INTEGER, 0, 0, 0, // 44
-          Number.MIN_SAFE_INTEGER, 0, 0, 0, // 48
-          Number.MIN_SAFE_INTEGER, 0, 0, 0 // 52
+          11 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 0
+          11 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 4
+          11 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 8
+          11 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 12
+          11 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 16
+          11 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 20
+          20 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 24
+          20 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 28
+          20 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 32
+          20 - geojsonFilterDomain0,
+          0,
+          0,
+          0, // 36
+          Number.MIN_SAFE_INTEGER,
+          0,
+          0,
+          0, // 40
+          Number.MIN_SAFE_INTEGER,
+          0,
+          0,
+          0, // 44
+          Number.MIN_SAFE_INTEGER,
+          0,
+          0,
+          0, // 48
+          Number.MIN_SAFE_INTEGER,
+          0,
+          0,
+          0 // 52
         ]);
         t.deepEqual(
           attributes.filterValues.value.slice(0, (indices.length - 1) * 4),

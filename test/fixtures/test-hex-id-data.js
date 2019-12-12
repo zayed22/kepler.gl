@@ -295,7 +295,7 @@ export const expectedMergedDataset = {
     }
   ],
   gpuFilter: {
-    filterRange: [[11.2, 28], [0, 0], [0, 0], [0, 0]],
+    filterRange: [[10.2, 27], [0, 0], [0, 0], [0, 0]],
     filterValueUpdateTriggers: {
       gpuFilter_0: 'value',
       gpuFilter_1: null,
@@ -306,7 +306,7 @@ export const expectedMergedDataset = {
       inputs: [
         {data: ['89283082c33ffff', 43], index: 6}
       ],
-      result: [43, 0, 0, 0]
+      result: [42, 0, 0, 0]
     }
   },
   filterRecord: {

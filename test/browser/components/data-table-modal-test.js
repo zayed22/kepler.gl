@@ -41,10 +41,11 @@ import {
   geoStyleRows
 } from 'test/fixtures/geojson';
 
-// This makes sure react-virtualized renders the full grid
-const WIDTH = 1400;
+// To makes sure react-virtualized renders the full grid
+// width needs to be large enough to fit all
+const WIDTH = 2400;
 const HEIGHT = 800;
-const rows = 10;
+const rows = testAllData.length;
 
 /* eslint-disable max-statements */
 test('Components -> DataTableModal.render: csv', t => {
@@ -61,8 +62,7 @@ test('Components -> DataTableModal.render: csv', t => {
           id: 'smoothie',
           allData: testAllData,
           fields: testFields,
-          color: [113, 113, 113],
-          data: testAllData.slice(0, rows)
+          color: [113, 113, 113]
         }
       }}
       dataId="smoothie"
@@ -92,8 +92,8 @@ test('Components -> DataTableModal.render: csv', t => {
   );
   t.equal(
     wrapper.find('StyledComponent.cell.boolean').length,
-    10,
-    'should render 10 boolean cells'
+    rows,
+    `should render ${rows.length} boolean cells`
   );
 
   const expectedRows = {

@@ -28,6 +28,7 @@ import {
   dataId,
   testRows,
   preparedDataset,
+  preparedFilterDomain0,
   arcLayerMeta
 } from 'test/helpers/layer-utils';
 
@@ -77,6 +78,8 @@ test('#ArcLayer -> constructor', t => {
 test('#ArcLayer -> formatLayerData', t => {
   const filteredIndex = [0, 2, 4];
 
+  // filter.domain: [ 1474071056000, 1474071489000 ]
+  // filterRange: [ [ 39000, 552000 ]
   const TEST_CASES = [
     {
       name: 'Arc trip data.1',
@@ -150,7 +153,7 @@ test('#ArcLayer -> formatLayerData', t => {
           layerData.data.map(layerData.getFilterValue),
           [
             [Number.MIN_SAFE_INTEGER, 0, 0, 0],
-            [moment.utc(testRows[4][0]).valueOf(), 0, 0, 0],
+            [moment.utc(testRows[4][0]).valueOf() - preparedFilterDomain0, 0, 0, 0],
           ],
           'getFilterValue should return [value, 0, 0, 0]'
         );
@@ -311,7 +314,7 @@ test('#ArcLayer -> formatLayerData', t => {
           layerData.data.map(layerData.getFilterValue),
           [
             [Number.MIN_SAFE_INTEGER, 0, 0, 0],
-            [moment.utc(testRows[4][0]).valueOf(), 0, 0, 0],
+            [moment.utc(testRows[4][0]).valueOf() - preparedFilterDomain0, 0, 0, 0],
           ],
           'getFilterValue should return [value, 0, 0, 0]'
         );

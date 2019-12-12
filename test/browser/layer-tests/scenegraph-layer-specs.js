@@ -32,7 +32,8 @@ import {
   preparedDataset,
   dataId,
   testRows,
-  pointLayerMeta
+  pointLayerMeta,
+  preparedFilterDomain0
 } from 'test/helpers/layer-utils';
 import {KeplerGlLayers} from 'layers';
 const {ScenegraphLayer} = KeplerGlLayers;
@@ -137,7 +138,7 @@ test('#ScenegraphLayer -> formatLayerData', t => {
           layerData.data.map(layerData.getFilterValue),
           [
             [Number.MIN_SAFE_INTEGER, 0, 0, 0],
-            [moment.utc(testRows[4][0]).valueOf(), 0, 0, 0],
+            [moment.utc(testRows[4][0]).valueOf() - preparedFilterDomain0, 0, 0, 0],
           ],
           'getFilterValue should return [value, 0, 0, 0]'
         );

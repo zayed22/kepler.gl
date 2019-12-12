@@ -77,6 +77,7 @@ test('#PointLayer -> constructor', t => {
 
 test('#PointLayer -> formatLayerData', t => {
   const filteredIndex = [0, 2, 4];
+  const filterDomain0 = 1474071056000;
 
   const TEST_CASES = [
     {
@@ -185,7 +186,7 @@ test('#PointLayer -> formatLayerData', t => {
           layerData.data.map(layerData.getFilterValue),
           [
             [Number.MIN_SAFE_INTEGER, 0, 0, 0],
-            [moment.utc(testRows[4][0]).valueOf(), 0, 0, 0]
+            [moment.utc(testRows[4][0]).valueOf() - filterDomain0, 0, 0, 0]
           ],
           'getFilterValue should return [0, 0, 0, 0]'
         );

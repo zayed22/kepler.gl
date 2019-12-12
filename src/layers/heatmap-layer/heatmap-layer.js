@@ -164,9 +164,7 @@ class HeatmapLayer extends MapboxGLLayer {
     this.visConfigSelector,
     this.weightFieldSelector,
     this.weightDomainSelector,
-    (visConfig, weightField, weightDomain) => {
-      console.log('get paint')
-      return {
+    (visConfig, weightField, weightDomain) => ({
       'heatmap-weight': weightField
         ? [
             'interpolate',
@@ -203,7 +201,7 @@ class HeatmapLayer extends MapboxGLLayer {
         visConfig.radius // radius
       ],
       'heatmap-opacity': visConfig.opacity
-    }}
+    })
   );
 
   computeHeatmapConfiguration = createSelector(

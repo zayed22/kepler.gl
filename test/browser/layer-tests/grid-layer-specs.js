@@ -102,6 +102,7 @@ test('#GridLayer -> formatLayerData', t => {
             data: testRows[index],
             index
           })),
+          _filterData: () => {},
           getColorValue: () => {},
           getElevationValue: () => {},
           getPosition: () => {}
@@ -132,14 +133,19 @@ test('#GridLayer -> formatLayerData', t => {
         t.equal(
           // assume all points fall into one bin
           layerData.getColorValue(expectedLayerData.data),
-          3,
-          'should return filtered point count'
+          5,
+          'should return unfiltered point count'
         );
         t.equal(
           // assume all points fall into one bin
           layerData.getElevationValue(expectedLayerData.data),
-          3,
-          'should return filtered point count'
+          5,
+          'should return unfiltered point count'
+        );
+        t.deepEqual(
+          layerData.data.map(layerData._filterData),
+          [false, false, true, true, true],
+          '_filterData should filter data correctly'
         );
         // test layer.meta
         t.deepEqual(
@@ -184,6 +190,7 @@ test('#GridLayer -> formatLayerData', t => {
             data: testRows[index],
             index
           })),
+          _filterData: () => {},
           getColorValue: () => {},
           getElevationValue: () => {},
           getPosition: () => {}
@@ -206,6 +213,11 @@ test('#GridLayer -> formatLayerData', t => {
           'driver_analytics',
           'should return filtered mode of (types)'
         );
+        t.deepEqual(
+          layerData.data.map(layerData._filterData),
+          [false, false, true, true, true],
+          '_filterData should filter data correctly'
+        );
         // test getColorValue aggregate by avg
         // 0: 1.59 - 0
         // 1: 2.38  - 0
@@ -215,7 +227,7 @@ test('#GridLayer -> formatLayerData', t => {
         t.equal(
           // assume all points fall into one bin
           layerData.getElevationValue(expectedLayerData.data),
-          (2.37 + 7.13 + 11) / 3,
+          (1.59 + 2.38 + 2.37 + 7.13 + 11) / 5,
           'should return filtered avg trip_distance'
         );
       }
@@ -261,21 +273,28 @@ test('#GridLayer -> renderLayer', t => {
         }
       },
       assert: (deckLayers, layer) => {
-        t.equal(deckLayers.length, 3, 'Should create 1 deck.gl layer');
-        const {props} = deckLayers[1];
-        console.log(deckLayers[1].state);
         t.deepEqual(
           deckLayers.map(l => l.id),
-          ['test_layer_1', 'test_layer_1-CPU', 'test_layer_1-CPU-grid-cell'],
-          'Should create 3 deck.gl layers'
+          ['test_layer_1', 'test_layer_1-grid-cell'],
+          'Should create 2 deck.gl layers'
         );
+        const [cpuGridLayer, grildCellLayer] = deckLayers;
+        const {props} = cpuGridLayer;
+        const gridCellLayerProp = grildCellLayer.props;
+
+        // console.log(JSON.stringify(gridCellLayerProp.data, null, 2));
 
         const expectedProps = {
           coverage: layer.config.visConfig.coverage,
           cellSize: layer.config.visConfig.worldUnitSize * 1000,
-          colorRange: [[8, 8, 8], [9, 9, 9], [7, 7, 7]],
-          colorScale: layer.config.colorScale,
-          sizeScale: layer.config.sizeScale,
+          colorRange: [
+            [8, 8, 8],
+            [9, 9, 9],
+            [7, 7, 7]
+          ],
+          colorScaleType: layer.config.colorScale,
+          elevationScaleType: layer.config.sizeScale,
+          elevationScale: layer.config.visConfig.elevationScale,
           upperPercentile: layer.config.visConfig.percentile[1],
           lowerPercentile: layer.config.visConfig.percentile[0]
         };
@@ -288,10 +307,99 @@ test('#GridLayer -> renderLayer', t => {
           );
         });
 
+        const expectedGridCellData = [
+          {
+            index: 0,
+            position: [-122.59661345873265, 37.743177277521255],
+            count: 2,
+            points: [
+              {
+                index: 0,
+                data: preparedDataset.allData[0]
+              },
+              {
+                index: 1,
+                data: preparedDataset.allData[1]
+              }
+            ],
+            filteredPoints: []
+          },
+          {
+            index: 1,
+            position: [-122.14283174694398, 37.38384344551697],
+            count: 2,
+            points: [
+              {
+                index: 4,
+                data: preparedDataset.allData[4]
+              },
+              {
+                index: 5,
+                data: preparedDataset.allData[5]
+              }
+            ],
+            filteredPoints: [
+              {
+                index: 4,
+                data: preparedDataset.allData[4]
+              },
+              {
+                index: 5,
+                data: preparedDataset.allData[5]
+              }
+            ]
+          },
+          {
+            index: 2,
+            position: [-122.36972260283831, 37.743177277521255],
+            count: 1,
+            points: [
+              {
+                index: 7,
+                data: preparedDataset.allData[7]
+              }
+            ],
+            filteredPoints: [
+              {
+                index: 7,
+                data: preparedDataset.allData[7]
+              }
+            ]
+          }
+        ];
+        const expectedColorBins = [
+          {i: 2, value: 1, counts: 1},
+          {i: 1, value: 2, counts: 2}
+        ];
+
+        const expectedElevationBins = [
+          {i: 2, value: 1, counts: 1},
+          {i: 1, value: 2, counts: 2}
+        ];
+
+        t.deepEqual(
+          gridCellLayerProp.data,
+          expectedGridCellData,
+          'should pass correct data to grid cell layer'
+        );
         t.deepEqual(
           spyLayerCallbacks.args[0][0],
-          [0, 2],
+          [1, 2],
           'should call onSetLayerDomain with correct domain'
+        );
+
+        t.deepEqual(
+          cpuGridLayer.state.aggregatorState.dimensions.fillColor.sortedBins
+            .sortedBins,
+          expectedColorBins,
+          'should create correct color bins'
+        );
+
+        t.deepEqual(
+          cpuGridLayer.state.aggregatorState.dimensions.elevation.sortedBins
+            .sortedBins,
+          expectedElevationBins,
+          'should create correct elevation bins'
         );
       }
     }

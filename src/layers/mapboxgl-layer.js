@@ -33,7 +33,6 @@ export const pointColResolver = ({lat, lng}) =>
   `${lat.fieldIdx}-${lng.fieldIdx}`;
 
 class MapboxLayerGL extends Layer {
-
   get overlayType() {
     return OVERLAY_TYPE.mapboxgl;
   }
@@ -69,24 +68,24 @@ class MapboxLayerGL extends Layer {
   sourceSelector = createSelector(
     this.datasetSelector,
     this.columnsSelector,
-    (datasetId, columns) => `${datasetId}-${columns}`,
+    (datasetId, columns) => `${datasetId}-${columns}`
   );
 
   filterSelector = createSelector(
     this.gpuFilterSelector,
-    gpuFilter => {
-      console.log('get filter')
-      return gpuFilterToMapboxFilter(gpuFilter);
-    }
+    gpuFilter => gpuFilterToMapboxFilter(gpuFilter)
   );
 
   getDataUpdateTriggers({filteredIndex, gpuFilter, id}) {
     const {columns} = this.config;
 
-    const visualChannelFields = Object.values(this.visualChannels).reduce((accu, v) => ({
-      ...accu,
-      ...(this.config[v.field] ? {[v.field]: this.config[v.field].name} : {})
-    }), {});
+    const visualChannelFields = Object.values(this.visualChannels).reduce(
+      (accu, v) => ({
+        ...accu,
+        ...(this.config[v.field] ? {[v.field]: this.config[v.field].name} : {})
+      }),
+      {}
+    );
 
     const updateTriggers = {
       getData: {
@@ -145,24 +144,14 @@ class MapboxLayerGL extends Layer {
       ...getPropertyFromFilter(d, i)
     });
 
-    return geoJsonFromData(
-      allData,
-      filteredIndex,
-      getGeometry,
-      getProperties
-    );
+    return geoJsonFromData(allData, filteredIndex, getGeometry, getProperties);
   }
 
   // this layer is rendered at mapbox level
   // todo: maybe need to find a better solution for this one
   shouldRenderLayer() {
-    return (
-      this.type &&
-      this.config.isVisible &&
-      this.hasAllColumns()
-    );
+    return this.type && this.config.isVisible && this.hasAllColumns();
   }
-
 }
 
 export default MapboxLayerGL;

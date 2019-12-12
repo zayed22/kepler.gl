@@ -41,10 +41,9 @@ export const pointPosResolver = ({lat, lng}) =>
 export const getValueAggrFunc = (
   field,
   aggregation
-  // filterRange,
-  // getFilterValue
 ) => {
   return points => {
+
     return field
       ? aggregate(
           points.map(p => p.data[field.tableFieldIndex - 1]),
@@ -257,7 +256,7 @@ export default class AggregationLayer extends Layer {
 
   formatLayerData(datasets, oldLayerData, opt = {}) {
     const getPosition = this.getPositionAccessor(); // if (
-    const {filteredIndex, allData, gpuFilter} = datasets[this.config.dataId];
+    const {gpuFilter} = datasets[this.config.dataId];
 
     const getColorValue = getValueAggrFunc(
       this.config.colorField,
@@ -281,7 +280,7 @@ export default class AggregationLayer extends Layer {
     return {
       data,
       getPosition,
-      filterData,
+      _filterData: filterData,
       ...(getColorValue ? {getColorValue} : {}),
       ...(getElevationValue ? {getElevationValue} : {})
     };
@@ -302,6 +301,8 @@ export default class AggregationLayer extends Layer {
     const {gpuFilter, mapState, layerCallbacks} = opts;
     const {visConfig} = this.config;
     const eleZoomFactor = this.getElevationZoomFactor(mapState);
+    console.log(Math.pow(2, Math.max(8 - mapState.zoom, 0)));
+    console.log('eleZoomFactor', eleZoomFactor)
     const updateTriggers = {
       getColorValue: {
         colorField: this.config.colorField,
@@ -311,7 +312,7 @@ export default class AggregationLayer extends Layer {
         sizeField: this.config.sizeField,
         sizeAggregation: this.config.visConfig.sizeAggregation
       },
-      filterData: {
+      _filterData: {
         filterRange: gpuFilter.filterRange,
         ...gpuFilter.filterValueUpdateTriggers
       }
@@ -324,13 +325,13 @@ export default class AggregationLayer extends Layer {
       // color
       colorRange: this.getColorRange(visConfig.colorRange),
       colorScaleType: this.config.colorScale,
-      elevationScaleType: this.config.sizeScale,
       upperPercentile: visConfig.percentile[1],
       lowerPercentile: visConfig.percentile[0],
 
       // elevation
       extruded: visConfig.enable3d,
       elevationScale: visConfig.elevationScale * eleZoomFactor,
+      elevationScaleType: this.config.sizeScale,
       elevationRange: visConfig.sizeRange,
       elevationLowerPercentile: visConfig.elevationPercentile[0],
       elevationUpperPercentile: visConfig.elevationPercentile[1],
