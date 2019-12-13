@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import {LayerManager} from 'deck.gl';
+import {LayerManager, MapView} from 'deck.gl';
 import React from 'react';
 import {gl} from '@deck.gl/test-utils';
 import sinon from 'sinon';
@@ -202,8 +202,14 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
   });
 }
 
-export function testInitializeDeckLayer(t, layerType, deckLayers, option = {}) {
-  const layerManager = new LayerManager(gl, option);
+export function testInitializeDeckLayer(t, layerType, deckLayers, {viewport}) {
+  const testViewport = new MapView().makeViewport({
+    width: viewport.width,
+    height: viewport.height,
+    viewState: viewport
+  });
+
+  const layerManager = new LayerManager(gl, {viewport: testViewport});
   const spy = sinon.spy(Console, 'error');
 
   t.doesNotThrow(

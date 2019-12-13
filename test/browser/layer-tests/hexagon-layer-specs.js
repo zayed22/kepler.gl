@@ -239,6 +239,7 @@ test('#HexagonLayer -> formatLayerData', t => {
 test('#HexagonLayer -> renderLayer', t => {
   const filteredIndex = [0, 1, 2, 4, 5, 7];
   const spyLayerCallbacks = sinon.spy();
+  const {allData} = preparedDataset;
 
   const TEST_CASES = [
     {
@@ -281,60 +282,60 @@ test('#HexagonLayer -> renderLayer', t => {
         const {props, state} = deckHexLayer;
 
         // deckGl default pointToHexbin reads viewport set to width: 1 and height: 1 on initial render
+        const pt0 = {
+          screenCoord: [41949.62272711111, 101320.76889147105],
+          index: 0,
+          data: allData[0]
+        };
+        const pt1 = {
+          screenCoord: [41936.53009066667, 101311.85384886562],
+          index: 1,
+          data: allData[1]
+        };
+        const pt4 = {
+          screenCoord: [42134.70003199999, 101616.81008745039],
+          index: 4,
+          data: allData[4]
+        };
+        const pt5 = {
+          screenCoord: [42159.752988444445, 101668.04589451979],
+          index: 5,
+          data: allData[5]
+        };
+        const pt7 = {
+          screenCoord: [42044.19845688889, 101228.11376437404],
+          index: 7,
+          data: allData[7]
+        };
+
         const expectedHexCellData = [
           {
-            position: [0, 0],
-            points: [
-              {
-                screenCoord: [-122.39096, 37.778564],
-                index: 0,
-                data: preparedDataset.allData[0]
-              },
-              {
-                screenCoord: [-122.40894, 37.78824],
-                index: 1,
-                data: preparedDataset.allData[1]
-              },
-              {
-                screenCoord: [-122.136795, 37.456535],
-                index: 4,
-                data: preparedDataset.allData[4]
-              },
-              {
-                screenCoord: [-122.10239, 37.40066],
-                index: 5,
-                data: preparedDataset.allData[5]
-              },
-              {
-                screenCoord: [-122.26108, 37.879066],
-                index: 7,
-                data: preparedDataset.allData[7]
-              }
-            ],
+            position: [-122.47496374709492, 37.71932315011047],
+            points: [pt0, pt1],
             index: 0,
-            filteredPoints: [
-              {
-                screenCoord: [-122.136795, 37.456535],
-                index: 4,
-                data: preparedDataset.allData[4]
-              },
-              {
-                screenCoord: [-122.10239, 37.40066],
-                index: 5,
-                data: preparedDataset.allData[5]
-              },
-              {
-                screenCoord: [-122.26108, 37.879066],
-                index: 7,
-                data: preparedDataset.allData[7]
-              }
-            ]
+            filteredPoints: []
+          },
+          {
+            position: [-122.2779601982836, 37.44892081775436],
+            points: [pt4, pt5],
+            index: 1,
+            filteredPoints: [pt4, pt5]
+          },
+          {
+            position: [-122.2779601982836, 37.98874207331562],
+            points: [pt7],
+            index: 2,
+            filteredPoints: [pt7]
           }
         ];
 
         // assigned by d3-hexbin
-        expectedHexCellData[0].points.x = 0;
-        expectedHexCellData[0].points.y = 0;
+        expectedHexCellData[0].points.x = 41888.45306522654;
+        expectedHexCellData[0].points.y = 101375.32539537722;
+        expectedHexCellData[1].points.x = 42031.9066716143;
+        expectedHexCellData[1].points.y = 101623.79433016981;
+        expectedHexCellData[2].points.x = 42031.9066716143;
+        expectedHexCellData[2].points.y = 101126.85646058463;
 
         const expectedProps = {
           coverage: layer.config.visConfig.coverage,
@@ -352,10 +353,12 @@ test('#HexagonLayer -> renderLayer', t => {
         };
 
         const expectedColorBins = [
-          {i: 0, value: 3, counts: 3}
+          {i: 2, value: 1, counts: 1},
+          {i: 1, value: 2, counts: 2},
         ];
         const expectedElevationBins = [
-          {i: 0, value: 3, counts: 3}
+          {i: 2, value: 1, counts: 1},
+          {i: 1, value: 2, counts: 2},
         ];
 
         t.deepEqual(
@@ -374,20 +377,18 @@ test('#HexagonLayer -> renderLayer', t => {
 
         t.deepEqual(
           spyLayerCallbacks.args[0][0],
-          [3],
+          [1, 2],
           'should call onSetLayerDomain with correct domain'
         );
 
         t.deepEqual(
-          state.aggregatorState.dimensions.fillColor.sortedBins
-            .sortedBins,
+          state.aggregatorState.dimensions.fillColor.sortedBins.sortedBins,
           expectedColorBins,
           'should create correct color bins'
         );
 
         t.deepEqual(
-          state.aggregatorState.dimensions.elevation.sortedBins
-            .sortedBins,
+          state.aggregatorState.dimensions.elevation.sortedBins.sortedBins,
           expectedElevationBins,
           'should create correct elevation bins'
         );
