@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import {HexagonLayer} from 'deck.gl';
+import {HexagonLayer} from '@deck.gl/aggregation-layers';
 import CPUAggregator, {getAggregatedData} from '../layer-utils/cpu-aggregator';
 
 export const hexagonAggregation = {

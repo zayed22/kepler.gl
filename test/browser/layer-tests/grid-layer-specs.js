@@ -278,11 +278,9 @@ test('#GridLayer -> renderLayer', t => {
           ['test_layer_1', 'test_layer_1-grid-cell'],
           'Should create 2 deck.gl layers'
         );
-        const [cpuGridLayer, grildCellLayer] = deckLayers;
+        const [cpuGridLayer, gridCellLayer] = deckLayers;
         const {props} = cpuGridLayer;
-        const gridCellLayerProp = grildCellLayer.props;
-
-        // console.log(JSON.stringify(gridCellLayerProp.data, null, 2));
+        const gridCellLayerProp = gridCellLayer.props;
 
         const expectedProps = {
           coverage: layer.config.visConfig.coverage,

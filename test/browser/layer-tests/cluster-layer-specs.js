@@ -31,31 +31,34 @@ import {
   pointLayerMeta
 } from 'test/helpers/layer-utils';
 
-import HexagonLayer from 'layers/hexagon-layer/hexagon-layer';
+import {KeplerGlLayers} from 'layers';
+import {INITIAL_MAP_STATE} from 'reducers/map-state-updaters';
+
+const {ClusterLayer} = KeplerGlLayers;
 
 const columns = {
   lat: 'lat',
   lng: 'lng'
 };
 
-test('#HexagonLayer -> constructor', t => {
+test('#ClusterLayer -> constructor', t => {
   const TEST_CASES = {
     CREATE: [
       {
         props: {
-          dataId: 'blue',
+          dataId: 'taro',
           isVisible: true,
-          label: 'test hexagon layer'
+          label: 'test cluster layer'
         },
         test: layer => {
           t.ok(
-            layer.config.dataId === 'blue',
-            'HexagonLayer dataId should be correct'
+            layer.config.dataId === 'taro',
+            'clusterLayer dataId should be correct'
           );
-          t.ok(layer.type === 'hexagon', 'type should be hexagon');
-          t.ok(layer.isAggregated === true, 'HexagonLayer is aggregated');
+          t.ok(layer.type === 'cluster', 'type should be cluster');
+          t.ok(layer.isAggregated === true, 'clusterLayer is aggregated');
           t.ok(
-            layer.config.label === 'test hexagon layer',
+            layer.config.label === 'test cluster layer',
             'label should be correct'
           );
           t.ok(
@@ -67,18 +70,18 @@ test('#HexagonLayer -> constructor', t => {
     ]
   };
 
-  testCreateCases(t, HexagonLayer, TEST_CASES.CREATE);
+  testCreateCases(t, ClusterLayer, TEST_CASES.CREATE);
   t.end();
 });
 
-test('#HexagonLayer -> formatLayerData', t => {
+test('#ClusterLayer -> formatLayerData', t => {
   const filteredIndex = [0, 1, 2, 4, 5, 7];
 
   const TEST_CASES = [
     {
-      name: 'hexagon layer gps point.1',
+      name: 'Cluster gps point.1',
       layer: {
-        type: 'hexagon',
+        type: 'cluster',
         id: 'test_layer_1',
         config: {
           dataId,
@@ -114,7 +117,7 @@ test('#HexagonLayer -> formatLayerData', t => {
         t.deepEqual(
           layerData.data,
           expectedLayerData.data,
-          'should format correct hexagon layerData'
+          'should format correct grid layerData'
         );
         // test getPosition
         t.deepEqual(
@@ -132,13 +135,13 @@ test('#HexagonLayer -> formatLayerData', t => {
           // assume all points fall into one bin
           layerData.getColorValue(expectedLayerData.data),
           5,
-          'should return filtered point count'
+          'should return unfiltered point count'
         );
         t.equal(
           // assume all points fall into one bin
           layerData.getElevationValue(expectedLayerData.data),
           5,
-          'should return filtered point count'
+          'should return unfiltered point count'
         );
         t.deepEqual(
           layerData.data.map(layerData._filterData),
@@ -149,14 +152,14 @@ test('#HexagonLayer -> formatLayerData', t => {
         t.deepEqual(
           layer.meta,
           pointLayerMeta,
-          'should format correct hexagon layer meta'
+          'should format correct grid layer meta'
         );
       }
     },
     {
-      name: 'Hexagon layer gps point.2',
+      name: 'Cluster gps point.2',
       layer: {
-        type: 'hexagon',
+        type: 'cluster',
         id: 'test_layer_2',
         config: {
           dataId,
@@ -216,35 +219,23 @@ test('#HexagonLayer -> formatLayerData', t => {
           [false, false, true, true, true],
           '_filterData should filter data correctly'
         );
-        // test getColorValue aggregate by avg
-        // 0: 1.59 - 0
-        // 1: 2.38  - 0
-        // 4: 2.37 - 1
-        // 5: 7.13 - 1
-        // 7: 11 - 1
-        t.equal(
-          // assume all points fall into one bin
-          layerData.getElevationValue(expectedLayerData.data),
-          (1.59 + 2.38 + 2.37 + 7.13 + 11) / 5,
-          'should return filtered avg trip_distance'
-        );
       }
     }
   ];
 
-  testFormatLayerDataCases(t, HexagonLayer, TEST_CASES);
+  testFormatLayerDataCases(t, ClusterLayer, TEST_CASES);
   t.end();
 });
 
-test('#HexagonLayer -> renderLayer', t => {
+test('#ClusterLayer -> renderLayer', t => {
   const filteredIndex = [0, 1, 2, 4, 5, 7];
   const spyLayerCallbacks = sinon.spy();
 
   const TEST_CASES = [
     {
-      name: 'Hexagon gps point.1',
+      name: 'Cluster gps point.1',
       layer: {
-        type: 'hexagon',
+        type: 'cluster',
         id: 'test_layer_1',
         config: {
           dataId,
@@ -273,96 +264,27 @@ test('#HexagonLayer -> renderLayer', t => {
       assert: (deckLayers, layer) => {
         t.deepEqual(
           deckLayers.map(l => l.id),
-          ['test_layer_1', 'test_layer_1-hexagon-cell'],
+          ['test_layer_1', 'test_layer_1-cluster'],
           'Should create 2 deck.gl layers'
         );
-
-        const [deckHexLayer, hexCellLayer] = deckLayers;
-        const {props, state} = deckHexLayer;
-
-        // deckGl default pointToHexbin reads viewport set to width: 1 and height: 1 on initial render
-        const expectedHexCellData = [
-          {
-            position: [0, 0],
-            points: [
-              {
-                screenCoord: [-122.39096, 37.778564],
-                index: 0,
-                data: preparedDataset.allData[0]
-              },
-              {
-                screenCoord: [-122.40894, 37.78824],
-                index: 1,
-                data: preparedDataset.allData[1]
-              },
-              {
-                screenCoord: [-122.136795, 37.456535],
-                index: 4,
-                data: preparedDataset.allData[4]
-              },
-              {
-                screenCoord: [-122.10239, 37.40066],
-                index: 5,
-                data: preparedDataset.allData[5]
-              },
-              {
-                screenCoord: [-122.26108, 37.879066],
-                index: 7,
-                data: preparedDataset.allData[7]
-              }
-            ],
-            index: 0,
-            filteredPoints: [
-              {
-                screenCoord: [-122.136795, 37.456535],
-                index: 4,
-                data: preparedDataset.allData[4]
-              },
-              {
-                screenCoord: [-122.10239, 37.40066],
-                index: 5,
-                data: preparedDataset.allData[5]
-              },
-              {
-                screenCoord: [-122.26108, 37.879066],
-                index: 7,
-                data: preparedDataset.allData[7]
-              }
-            ]
-          }
-        ];
-
-        // assigned by d3-hexbin
-        expectedHexCellData[0].points.x = 0;
-        expectedHexCellData[0].points.y = 0;
+        const [clusterLayer, scatterplotLayer] = deckLayers;
+        const {props} = clusterLayer;
+        const scatterplotLayerProp = scatterplotLayer.props;
 
         const expectedProps = {
-          coverage: layer.config.visConfig.coverage,
-          radius: layer.config.visConfig.worldUnitSize * 1000,
           colorRange: [
             [8, 8, 8],
             [9, 9, 9],
             [7, 7, 7]
           ],
+          radiusScale: 1,
+          radiusRange: layer.config.visConfig.radiusRange,
+          clusterRadius: layer.config.visConfig.clusterRadius,
           colorScaleType: layer.config.colorScale,
-          elevationScaleType: layer.config.sizeScale,
-          elevationScale: layer.config.visConfig.elevationScale,
-          upperPercentile: layer.config.visConfig.percentile[1],
-          lowerPercentile: layer.config.visConfig.percentile[0]
+          zoom: Math.round(INITIAL_MAP_STATE.zoom),
+          width: INITIAL_MAP_STATE.width,
+          height: INITIAL_MAP_STATE.height
         };
-
-        const expectedColorBins = [
-          {i: 0, value: 3, counts: 3}
-        ];
-        const expectedElevationBins = [
-          {i: 0, value: 3, counts: 3}
-        ];
-
-        t.deepEqual(
-          hexCellLayer.props.data,
-          expectedHexCellData,
-          'should pass correct data to hexagon cell layer'
-        );
 
         Object.keys(expectedProps).forEach(key => {
           t.deepEqual(
@@ -372,29 +294,82 @@ test('#HexagonLayer -> renderLayer', t => {
           );
         });
 
+        const expectedScatterplotData = [
+          {
+            points: [
+              {index: 0, data: preparedDataset.allData[0]},
+              {index: 1, data: preparedDataset.allData[1]}
+            ],
+            position: [-122.39995, 37.78340215834403],
+            index: 0,
+            filteredPoints: []
+          },
+          {
+            points: [
+              {index: 4, data: preparedDataset.allData[4]}
+            ],
+            position: [-122.136795, 37.456535],
+            index: 1,
+            filteredPoints: [{index: 4, data: preparedDataset.allData[4]}]
+          },
+          {
+            points: [
+              {index: 5, data: preparedDataset.allData[5]}
+            ],
+            position: [-122.10239, 37.40066],
+            index: 2,
+            filteredPoints: [{index: 5, data: preparedDataset.allData[5]}]
+          },
+          {
+            points: [
+              {index: 7, data: preparedDataset.allData[7]}
+            ],
+            position: [-122.26108, 37.879066],
+            index: 3,
+            filteredPoints: [{index: 7, data: preparedDataset.allData[7]}]
+          }
+        ];
+
+        const expectedColorBins = [
+          {i: 1, value: 1, counts: 1},
+          {i: 2, value: 1, counts: 1},
+          {i: 3, value: 1, counts: 1}
+        ];
+
+        t.deepEqual(
+          scatterplotLayerProp.data,
+          expectedScatterplotData,
+          'should pass correct data to cluster layer'
+        );
         t.deepEqual(
           spyLayerCallbacks.args[0][0],
-          [3],
+          [1, 1, 1],
           'should call onSetLayerDomain with correct domain'
         );
 
+        // fillColor
         t.deepEqual(
-          state.aggregatorState.dimensions.fillColor.sortedBins
+          clusterLayer.state.aggregatorState.dimensions.fillColor.sortedBins
             .sortedBins,
           expectedColorBins,
-          'should create correct color bins'
+          'should create correct color bins sortedBins'
+        );
+        t.deepEqual(
+          clusterLayer.state.aggregatorState.dimensions.fillColor.valueDomain,
+          [1, 1, 1],
+          'should create correct radius valueDomain based on filteredPoints'
         );
 
+        // radius
         t.deepEqual(
-          state.aggregatorState.dimensions.elevation.sortedBins
-            .sortedBins,
-          expectedElevationBins,
-          'should create correct elevation bins'
+          clusterLayer.state.aggregatorState.dimensions.radius.valueDomain,
+          [0, 1],
+          'should create correct radius valueDomain based on filteredPoints'
         );
       }
     }
   ];
 
-  testRenderLayerCases(t, HexagonLayer, TEST_CASES);
+  testRenderLayerCases(t, ClusterLayer, TEST_CASES);
   t.end();
 });

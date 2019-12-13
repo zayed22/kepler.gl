@@ -433,7 +433,6 @@ test('#PointLayer -> formatLayerData', t => {
 
 test('#PointLayer -> renderLayer', t => {
   const filteredIndex = [0, 2, 4];
-  const dataCount = 2;
   const TEST_CASES = [
     {
       name: 'Test render point.1',
@@ -671,6 +670,9 @@ test('#PointLayer -> renderLayer', t => {
           expectedPixelOffset1,
           'Should calculate correct instancePixelOffset multiplied by getRadius'
         );
+
+
+        const {attributes} = deckLayers[0].state.attributeManager;
       }
     }
   ];

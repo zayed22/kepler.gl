@@ -34,7 +34,7 @@ const defaultRadius = LAYER_VIS_CONFIGS.clusterRadius.defaultValue;
 const defaultRadiusRange = LAYER_VIS_CONFIGS.clusterRadiusRange.defaultValue;
 
 const defaultGetColorValue = points => points.length;
-const defaultGetRadiusValue = cell => cell.points.length;
+const defaultGetRadiusValue = cell => cell.filteredPoints ? cell.filteredPoints.length : cell.points.length;
 
 function processGeoJSON(step, props, aggregation, viewport) {
   const {data, getPosition, filterData} = props;
@@ -48,6 +48,7 @@ function getClusters(step, props, aggregation, viewport) {
   const {geoJSON, clusterBuilder} = this.state;
   const {clusterRadius, zoom, width, height} = props;
   const {longitude, latitude} = viewport;
+
   // zoom needs to be an integer for the different map utils. Also helps with cache key.
   const bbox = geoViewport.bounds([longitude, latitude], zoom, [width, height]);
   const clusters = clusterBuilder.clustersAtZoom({bbox, clusterRadius, geoJSON, zoom});
@@ -208,6 +209,7 @@ export default class ClusterLayer extends CompositeLayer {
     // base layer props
     const {opacity, pickable, autoHighlight, highlightColor} = this.props;
     const updateTriggers = this._getSublayerUpdateTriggers();
+
     const distanceScale = getDistanceScales(this.context.viewport);
     const metersPerPixel = distanceScale.metersPerPixel[0];
 

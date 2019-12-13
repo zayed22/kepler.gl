@@ -37,10 +37,7 @@ import {LayerClasses} from 'layers';
 import {processCsvData, processGeojson} from 'processors/data-processor';
 import {applyActions} from 'test/helpers/mock-state';
 import {visStateReducer} from 'reducers';
-import csvData, {
-  dataWithNulls as csvDataWithNulls,
-  wktCsv
-} from 'test/fixtures/test-csv-data';
+import csvData, {wktCsv} from 'test/fixtures/test-csv-data';
 import testLayerData, {bounds} from 'test/fixtures/test-layer-data';
 import {geojsonData} from 'test/fixtures/geojson';
 import {logStep} from '../../scripts/log';
@@ -165,10 +162,12 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
     const layer = testCreateLayerFromConfig(t, tc);
     let result;
     let deckLayers;
+    let viewport = INITIAL_MAP_STATE;
 
     if (layer) {
       result = testFormatLayerData(t, layer, tc.datasets);
     }
+
     if (result) {
       t.doesNotThrow(() => {
         deckLayers = layer.renderLayer({
@@ -181,6 +180,10 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
           interactionConfig: INITIAL_VIS_STATE.interactionConfig,
           ...(tc.renderArgs || {})
         });
+
+        if (tc.renderArgs && tc.renderArgs.viewport) {
+          viewport = {...viewport, ...tc.renderArgs.viewport};
+        }
       }, `${layer.type}.renderLayer should not fail`);
     }
 
@@ -188,7 +191,8 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
       const initialDeckLayers = testInitializeDeckLayer(
         t,
         layer.type,
-        deckLayers
+        deckLayers,
+        {viewport}
       );
 
       if (tc.assert) {
@@ -198,8 +202,8 @@ export function testRenderLayerCases(t, LayerClass, testCases) {
   });
 }
 
-export function testInitializeDeckLayer(t, layerType, deckLayers) {
-  const layerManager = new LayerManager(gl);
+export function testInitializeDeckLayer(t, layerType, deckLayers, option = {}) {
+  const layerManager = new LayerManager(gl, option);
   const spy = sinon.spy(Console, 'error');
 
   t.doesNotThrow(
@@ -275,9 +279,6 @@ function addFilterToData(data, id, filters) {
 export const {rows, fields} = processCsvData(csvData);
 export const {rows: testRows, fields: testFields} = processCsvData(testLayerData);
 
-export const {rows: rowsWithNull, fields: fieldsWithNull} = processCsvData(
-  csvDataWithNulls
-);
 export const dataId = '0dj3h';
 export {
   dataId as tripDataId,
@@ -299,6 +300,7 @@ const stateWithTimeFilter = addFilterToData(
 );
 
 export const preparedDataset = stateWithTimeFilter.datasets[dataId];
+
 export const gpuTimeFilter = stateWithTimeFilter.filters[0];
 
 export const preparedFilterDomain0 = gpuTimeFilter.domain[0];
@@ -331,7 +333,6 @@ const stateWithGeojsonFilter = addFilterToData(
     {name: 'TRIPS', value: [4, 12]}
   ]
 );
-
 
 export const prepareGeojsonDataset = stateWithGeojsonFilter.datasets[dataId];
 export const prepareGeojsonDatasetFilter = stateWithGeojsonFilter.filters[0];

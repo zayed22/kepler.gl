@@ -48,8 +48,6 @@ import {
 import {createNewDataEntry} from 'utils/dataset-utils';
 import {processGeojson} from 'processors/data-processor';
 
-//
-
 test('#GeojsonLayer -> constructor', t => {
   const TEST_CASES = {
     CREATE: [

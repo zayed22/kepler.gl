@@ -22,25 +22,24 @@ import test from 'tape';
 import {
   testCreateCases,
   testFormatLayerDataCases,
-  testRenderLayerCases,
   preparedDataset,
-  preparedDatasetWithNull,
   dataId,
-  rows,
-  rowsWithNull,
-  fieldsWithNull
+  pointLayerMeta
 } from 'test/helpers/layer-utils';
-import {processCsvData} from 'processors/data-processor';
-import csvData from 'test/fixtures/test-csv-data';
 
 import HeatmapLayer from 'layers/heatmap-layer/heatmap-layer';
+
+const columns = {
+  lat: 'lat',
+  lng: 'lng'
+};
 
 test('#HeatmapLayer -> contructor', t => {
   const TEST_CASES = {
     CREATE: [
       {
         props: {
-          dataId: 'heatmap',
+          dataId: 'taro',
           isVisible: true,
           label: 'test heatmap layer'
         },
@@ -50,6 +49,20 @@ test('#HeatmapLayer -> contructor', t => {
             layer.config.visConfig.radius,
             20,
             'Heatmap default radius should be 20'
+          );
+          t.ok(
+            layer.config.dataId === 'taro',
+            'heatmaplayer dataId should be correct'
+          );
+          t.ok(layer.type === 'heatmap', 'type should be heatmap');
+          t.ok(layer.isAggregated === true, 'heatmaplayer is aggregated');
+          t.ok(
+            layer.config.label === 'test heatmap layer',
+            'label should be correct'
+          );
+          t.ok(
+            Object.keys(layer.columnPairs).length,
+            'should have columnPairs'
           );
         }
       }
@@ -61,20 +74,29 @@ test('#HeatmapLayer -> contructor', t => {
 });
 
 test('#Heatmaplayer -> formatLayerData', t => {
-  // const {rows} = processCsvData(csvData);
   const filteredIndex = [0, 2, 4];
-  const columns = {
-    lat: 'gps_data.lat',
-    lng: 'gps_data.lng'
-  };
+
   const expectedConfig = {
     type: 'heatmap',
-    id: 'assign_from_layer',
-    source: 'heatmap-1-2',
+    id: 'heatmap-test-1',
+    source: `${dataId}-1-2`,
     layout: {visibility: 'visible'},
     maxzoom: 18,
+    filter: [
+      'all',
+      ['>=', 'gpu:utc_timestamp', 39000],
+      ['<=', 'gpu:utc_timestamp', 552000]
+    ],
     paint: {
-      'heatmap-weight': 1,
+      'heatmap-weight': [
+        'interpolate',
+        ['linear'],
+        ['get', 'id'],
+        1,
+        0,
+        345,
+        1
+      ],
       'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 18, 3],
       'heatmap-color': [
         'interpolate',
@@ -105,12 +127,16 @@ test('#Heatmaplayer -> formatLayerData', t => {
       name: 'Heatmap gps point.1',
       layer: {
         type: 'heatmap',
-        id: 'test_layer_1',
+        id: 'heatmap-test-1',
         config: {
           dataId,
           label: 'mapbox heatmap',
           isVisible: true,
-          columns
+          columns,
+          weightField: {
+            type: 'integer',
+            name: 'id'
+          }
         }
       },
       datasets: {
@@ -119,12 +145,9 @@ test('#Heatmaplayer -> formatLayerData', t => {
           filteredIndex
         }
       },
-      test: result => {
+      assert: result => {
         const {layerData, layer} = result;
 
-        const expectedLayerMeta = {
-          bounds: [31.2148748, 29.9870074, 31.2590542, 30.0614122]
-        };
         const expectedLayerData = {
           columns,
           config: expectedConfig,
@@ -133,123 +156,21 @@ test('#Heatmaplayer -> formatLayerData', t => {
             features: [
               {
                 type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2590542, 29.9900937]}
+                properties: {
+                  index: 0,
+                  'gpu:utc_timestamp': Number.MIN_SAFE_INTEGER,
+                  id: 1
+                },
+                geometry: {type: 'Point', coordinates: [-122.39096, 37.778564]}
               },
               {
                 type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2461142, 29.9927699]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2312742, 29.9907261]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2175827, 29.9870074]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2154899, 29.9923041]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2149361, 29.9968249]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2164035, 30.0037217]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2179346, 30.0116207]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2179556, 30.0208925]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2178842, 30.0218999]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2179138, 30.0229344]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2179415, 30.0264237]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2181809, 30.0292134]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2193991, 30.034391]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2181803, 30.0352752]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2195902, 30.0395918]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2174421, 30.0497387]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2165983, 30.0538936]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2148748, 30.060911]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2212278, 30.060334]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2288985, 30.0554663]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2187021, 30.0614122]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2191059, 30.0612697]}
-              },
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {type: 'Point', coordinates: [31.2194728, 30.0610977]}
+                properties: {
+                  index: 4,
+                  'gpu:utc_timestamp': 184000,
+                  id: 5
+                },
+                geometry: {type: 'Point', coordinates: [-122.136795, 37.456535]}
               }
             ]
           },
@@ -271,11 +192,6 @@ test('#Heatmaplayer -> formatLayerData', t => {
         );
 
         // test columns,
-        t.deepEqual(
-          layerData.columns,
-          expectedLayerData.columns,
-          'should format correct heatmap layerData.columns'
-        );
         expectedLayerData.config.id = layer.id;
         // test config
         t.deepEqual(
@@ -283,16 +199,11 @@ test('#Heatmaplayer -> formatLayerData', t => {
           expectedLayerData.config,
           'should format correct heatmap layerData.config'
         );
-        // test weightField
-        t.deepEqual(
-          layerData.weightField,
-          expectedLayerData.weightField,
-          'should format correct heatmap weightField'
-        );
+
         // test layer.meta
         t.deepEqual(
           layer.meta,
-          expectedLayerMeta,
+          pointLayerMeta,
           'should format correct heatmap layer.meta'
         );
       }
