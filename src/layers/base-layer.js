@@ -835,7 +835,7 @@ export default class Layer {
 
     let data = [];
     if (!triggerChanged.getData) {
-      //  console.log('same data')
+      // same data
       data = oldLayerData.data;
     } else {
       data = this.calculateDataAttribute(layerDataset, getPosition);
@@ -856,8 +856,8 @@ export default class Layer {
     if (!dataset) {
       return this;
     }
-
     Object.values(this.visualChannels).forEach(channel => {
+
       const {scale} = channel;
       const scaleType = this.config[scale];
       // ordinal domain is based on allData, if only filter changed

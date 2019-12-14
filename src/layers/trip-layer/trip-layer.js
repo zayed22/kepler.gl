@@ -40,11 +40,14 @@ import {
 import {hexToRgb} from 'utils/color-utils';
 import TripInfoModalFactory from './trip-info-modal';
 
+export const defaultThickness = 0.5;
+export const defaultWidth = 1;
+
 export const tripVisConfigs = {
   opacity: 'opacity',
   thickness: {
     type: 'number',
-    defaultValue: 0.5,
+    defaultValue: defaultThickness,
     label: 'Stroke Width',
     isRanged: false,
     range: [0, 100],
@@ -191,7 +194,7 @@ export default class TripLayer extends Layer {
       visConfig
     } = this.config;
 
-    const {stroked, colorRange, sizeRange} = visConfig;
+    const {colorRange, sizeRange} = visConfig;
     const {allData, gpuFilter} = datasets[this.config.dataId];
     const {data} = this.updateData(datasets, oldLayerData);
 
@@ -203,11 +206,9 @@ export default class TripLayer extends Layer {
         colorDomain,
         colorRange.colors.map(hexToRgb)
       );
-
     // calculate stroke scale - if stroked = true
     const sScale =
       sizeField &&
-      stroked &&
       this.getVisChannelScale(sizeScale, sizeDomain, sizeRange);
     // access feature properties from geojson sub layer
     const getDataForGpuFilter = f => allData[f.properties.index];
@@ -237,7 +238,7 @@ export default class TripLayer extends Layer {
               sizeField,
               0
             )
-          : d.properties.lineWidth || 1
+          : d.properties.lineWidth || defaultWidth
     };
   }
   /* eslint-enable complexity */

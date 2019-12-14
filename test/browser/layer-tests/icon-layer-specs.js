@@ -60,29 +60,6 @@ const mockSvgIcons = [
   }
 ];
 
-const expectedIconGeometry = {
-  alert: [
-    1,
-    -0.5,
-    0,
-    0.9,
-    -0.52,
-    0,
-    0.3,
-    -0.4,
-    0,
-    0.9,
-    -0.52,
-    0,
-    0.97,
-    -0.5,
-    0,
-    0.3,
-    -0.4,
-    0
-  ]
-};
-
 test('#IconLayer -> constructor', t => {
   const TEST_CASES = {
     CREATE: [
@@ -306,7 +283,9 @@ test('#IconLayer -> renderLayer', t => {
         }
       },
       afterLayerInitialized: layer => {
+
         layer.iconGeometry = iconGeometry;
+        console.log(layer.iconGeometry)
       },
       datasets: {
         [dataId]: {

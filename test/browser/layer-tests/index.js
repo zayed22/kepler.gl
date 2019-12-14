@@ -30,4 +30,4 @@ import './icon-layer-specs';
 import './line-layer-specs';
 import './point-layer-specs';
 import './scenegraph-layer-specs';
-// import './trip-layer-specs';
+import './trip-layer-specs';
