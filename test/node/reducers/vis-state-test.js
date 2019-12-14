@@ -885,19 +885,12 @@ test('#visStateReducer -> REMOVE_FILTER', t => {
   const initialState = StateWFilters.visState;
   // filter[0]: 'time' '190vdll3di'
   // filter[1]: 'RATE' 'ieukmgne'
-  console.log(initialState.layers.map(l => ({id: l.id, dataId: l.config.dataId})));
 
   const dataset0 = initialState.datasets['190vdll3di'];
   const dataset1 = initialState.datasets.ieukmgne;
 
   const expectedData0 = {
     ...dataset0,
-    // allData: initialState.datasets.190vdll3di.allData
-    // allIndexes: initialState.datasets.190vdll3di.allIndexes,
-    // filteredIndex: initialState.datasets.190vdll3di.filteredIndex,
-    // filteredIndexForDomain: initialState.datasets.190vdll3di.filteredIndexForDomain,
-    // fieldPairs: initialState.datasets.190vdll3di.fieldPairs,
-    // fields: initialState.datasets.190vdll3di.fields,
     gpuFilter: {
       filterRange: [
         [1474606800000 - 1474588800000, 1474617600000 - 1474588800000],
