@@ -927,7 +927,18 @@ export const updatedLayerV2 = {
       },
       geometry: {
         type: 'Polygon',
-        coordinates: [[[-74.387589, 40.632238], [-74.387589, 40.632238]]]
+        coordinates: [
+          [
+            [
+              -74.387589,
+              40.632238
+            ],
+            [
+              -74.387589,
+              40.632238
+            ]
+          ]
+        ]
       }
     },
     {

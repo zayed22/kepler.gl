@@ -19,7 +19,6 @@
 // THE SOFTWARE.
 
 import GeojsonLayer from 'layers/geojson-layer/geojson-layer';
-import {Messages, Crosshairs} from 'components/common/icons';
 import {DEFAULT_TEXT_LABEL, DEFAULT_COLOR_UI} from 'layers/layer-factory';
 import {getDefaultInteraction} from 'utils/interaction-utils';
 
