@@ -95,7 +95,7 @@ export function resetFilterGpuMode(filters) {
  * @returns {Array<Array<Number>>}
  */
 function getEmptyFilterRange() {
-  return new Array(MAX_GPU_FILTERS).fill(0).map(d => [0, 0]);
+  return new Array(MAX_GPU_FILTERS).fill([0, 0]);
 }
 
 // By default filterValueAccessor expect each datum to be formated as {index, data}

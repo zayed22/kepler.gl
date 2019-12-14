@@ -3991,42 +3991,42 @@ export const sampleTripDataConfig = {
             },
             isVisible: true
           }
+        },
+        {
+          type: 'point',
+          config: {
+            dataId: 'test_trip_data',
+            columns: {
+              lat: 'pickup_latitude',
+              lng: 'pickup_longitude'
+            },
+            isVisible: true
+          }
+        },
+        {
+          type: 'cluster',
+          config: {
+            dataId: 'test_trip_data',
+            columns: {
+              lat: 'pickup_latitude',
+              lng: 'pickup_longitude'
+            },
+            isVisible: true
+          }
+        },
+        {
+          type: 'arc',
+          config: {
+            dataId: 'test_trip_data',
+            columns: {
+              lat0: 'pickup_latitude',
+              lng0: 'pickup_longitude',
+              lat1: 'dropoff_latitude',
+              lng1: 'dropoff_longitude'
+            },
+            isVisible: true
+          }
         }
-        // {
-        //   type: 'point',
-        //   config: {
-        //     dataId: 'test_trip_data',
-        //     columns: {
-        //       lat: 'pickup_latitude',
-        //       lng: 'pickup_longitude'
-        //     },
-        //     isVisible: true
-        //   }
-        // },
-        // {
-        //   type: 'cluster',
-        //   config: {
-        //     dataId: 'test_trip_data',
-        //     columns: {
-        //       lat: 'pickup_latitude',
-        //       lng: 'pickup_longitude'
-        //     },
-        //     isVisible: true
-        //   }
-        // },
-        // {
-        //   type: 'arc',
-        //   config: {
-        //     dataId: 'test_trip_data',
-        //     columns: {
-        //       lat0: 'pickup_latitude',
-        //       lng0: 'pickup_longitude',
-        //       lat1: 'dropoff_latitude',
-        //       lng1: 'dropoff_longitude'
-        //     },
-        //     isVisible: true
-        //   }
-        // }
       ],
       filters: [
         {

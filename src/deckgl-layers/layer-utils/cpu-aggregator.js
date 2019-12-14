@@ -20,6 +20,8 @@
 
 /* eslint-disable guard-for-in */
 import {experimental, AGGREGATION_OPERATION} from '@deck.gl/aggregation-layers';
+import {console as Console} from 'global/window';
+
 import {aggregate} from 'utils/aggregate-utils';
 import {AGGREGATION_TYPES, SCALE_FUNC} from 'constants/default-settings';
 
@@ -33,6 +35,10 @@ export const DECK_AGGREGATION_MAP = {
 };
 
 export function getValueFunc(aggregation, accessor) {
+  if (!aggregation || !AGGREGATION_OPERATION[aggregation.toUpperCase()]) {
+    Console.warn(`Aggregation ${aggregation} is not supported`);
+  }
+
   const op =
     AGGREGATION_OPERATION[aggregation.toUpperCase()] ||
     AGGREGATION_OPERATION.SUM;
@@ -42,6 +48,9 @@ export function getValueFunc(aggregation, accessor) {
 }
 
 export function getScaleFunctor(scaleType) {
+  if (!scaleType || !SCALE_FUNC[scaleType]) {
+    Console.warn(`Scale ${scaleType} is not supported`);
+  }
   return SCALE_FUNC[scaleType] || SCALE_FUNC.quantize;
 }
 
@@ -110,13 +119,9 @@ export function getDimensionScale(step, props, dimensionUpdater) {
   const dimensionDomain =
     props[domain.prop] || this.state.dimensions[key].valueDomain;
 
-  const scaleFunctor = getScaleFunctor(
-    scaleType && props[scaleType.prop]
-  )();
+  const scaleFunctor = getScaleFunctor(scaleType && props[scaleType.prop])();
 
-  const scaleFunc = scaleFunctor
-    .domain(dimensionDomain)
-    .range(dimensionRange);
+  const scaleFunc = scaleFunctor.domain(dimensionDomain).range(dimensionRange);
 
   if (typeof onSet === 'object' && typeof props[onSet.props] === 'function') {
     props[onSet.props](scaleFunc.domain());

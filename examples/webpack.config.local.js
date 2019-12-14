@@ -258,7 +258,6 @@ function addBabelSettings(env, config, exampleDir) {
 }
 
 module.exports = (exampleConfig, exampleDir) => env => {
-  // const deckPath = join(NODE_MODULES_DIR, '@deck.gl');
 
   // find all @deck.gl @luma.gl @loaders.gl modules
   const modules = ['@deck.gl', '@loaders.gl', '@luma.gl', '@probe.gl'];

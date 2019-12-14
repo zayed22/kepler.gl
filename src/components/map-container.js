@@ -152,8 +152,6 @@ export default function MapContainerFactory(MapPopover, MapControl) {
       });
     };
 
-    // _onWebGLInitialized = onWebGLInitialized;
-
     _handleMapToggleLayer = layerId => {
       const {index: mapIndex = 0, visStateActions} = this.props;
       visStateActions.toggleLayerForMap(mapIndex, layerId);
@@ -296,17 +294,11 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         clicked,
         mapState,
         interactionConfig,
-        // mousePos,
         animationConfig
       } = this.props;
       const layer = layers[idx];
       const data = layerData[idx];
       const {gpuFilter} = datasets[layer.config.dataId] || {};
-      // console.log(datasets[layer.config.dataId])
-      // const layerInteraction = {
-      //   mousePositionXY: mousePos.mousePosition,
-      //   wrapLongitude: true
-      // };
 
       const objectHovered = clicked || hoverInfo;
       const layerCallbacks = {
@@ -320,7 +312,6 @@ export default function MapContainerFactory(MapPopover, MapControl) {
         idx,
         interactionConfig,
         layerCallbacks,
-        // layerInteraction,
         mapState,
         animationConfig,
         objectHovered

@@ -38,7 +38,7 @@ function addInstanceCoverage(vs) {
   );
 }
 
-// TODO: export all dekc.gl layers from kepler.gl
+// TODO: export all deck.gl layers from kepler.gl
 class EnhancedColumnLayer extends ColumnLayer {
 
   getShaders() {
